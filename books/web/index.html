@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="et">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Printsess Frida päev</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <main id="stage" aria-live="polite">
+    <div id="scene"></div>
+    <div id="fx"></div>
+    <p id="text"></p>
+
+    <nav id="controls">
+      <button id="prev" aria-label="Eelmine lehekülg">◀</button>
+      <button id="read" aria-label="Loe ette">🔊</button>
+      <button id="auto" aria-label="Loe terve raamat ette">▶</button>
+      <button id="next" aria-label="Järgmine lehekülg">▶▶</button>
+    </nav>
+    <div id="dots"></div>
+  </main>
+
+  <script src="story.js"></script>
+  <script src="scenes.js"></script>
+  <script src="book.js"></script>
+</body>
+</html>

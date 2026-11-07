@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="et">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Väikese Rexi päev</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="motion.css" />
+</head>
+<body class="v2">
+  <main id="stage" aria-live="polite">
+    <div id="scene"></div>
+    <div id="fx"></div>
+    <p id="text"></p>
+    <div id="mg"></div>
+    <div id="prog"><div id="prog-fill"></div><div id="prog-crown"><svg viewBox="-34 -40 68 56"><ellipse cx="0" cy="0" rx="20" ry="16" fill="#7ccf6a" stroke="#4f9e45" stroke-width="3"/><ellipse cx="-18" cy="-22" rx="7" ry="10" fill="#7ccf6a" stroke="#4f9e45" stroke-width="3"/><ellipse cx="0" cy="-28" rx="7" ry="10" fill="#7ccf6a" stroke="#4f9e45" stroke-width="3"/><ellipse cx="18" cy="-22" rx="7" ry="10" fill="#7ccf6a" stroke="#4f9e45" stroke-width="3"/></svg></div></div>
+
+    <nav id="controls">
+      <button id="prev" aria-label="Eelmine lehekülg">◀</button>
+      <button id="read" aria-label="Loe ette">🔊</button>
+      <button id="auto" aria-label="Loe terve raamat ette">▶</button>
+      <button id="next" aria-label="Järgmine lehekülg">▶▶</button>
+    </nav>
+    <div id="dots"></div>
+  </main>
+
+  <script src="dino-story.js"></script>
+  <script src="scenes.js"></script>
+  <script src="dino-scenes.js"></script>
+  <script src="motion.js"></script>
+  <script src="book.js"></script>
+</body>
+</html>

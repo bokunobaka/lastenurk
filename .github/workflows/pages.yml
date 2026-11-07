@@ -1,4 +1,5 @@
-# Builds the game and publishes it with GitHub Pages on every push to main.
+# Builds the landing page, every game in games/ and every book in books/ into one site,
+# and publishes it with GitHub Pages on every push to main.
 name: Deploy to GitHub Pages
 
 on:
@@ -27,10 +28,10 @@ jobs:
         with:
           node-version: 22
           cache: npm
-      - run: npm ci
-      - run: npm run build
+          cache-dependency-path: games/*/package-lock.json
+      - run: scripts/build-site.sh
       - uses: actions/upload-pages-artifact@v3
         with:
-          path: dist
+          path: _site
       - id: deployment
         uses: actions/deploy-pages@v4
