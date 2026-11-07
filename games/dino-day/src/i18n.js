@@ -19,6 +19,7 @@ const L = {
   'aria.skin': ['värv', 'colour'],
   'aria.hat': ['müts', 'hat'],
   'aria.done': ['Valmis', 'Done'],
+  'aria.corner': ['Tagasi lastenurka', 'Back to the kids’ corner'],
   'wardrobe.pick': ['Vali värv ja müts!', 'Pick a colour and a hat!'],
   'wardrobe.locked': ['Selle saad päevi mängides!', 'You get this by playing the days!'],
   'map.title': ['Vali päev', 'Pick a day'],

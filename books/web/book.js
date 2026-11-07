@@ -1,6 +1,6 @@
-// Web book runtime: page navigation, media swap-in, narration, tap sparkles, video mode.
+// Web book runtime: page navigation, media swap-in, narration, tap sparkles, video mode, language.
 (() => {
-  const { PAGES } = globalThis.STORY;
+  const { PAGES, TITLE, TITLE_EN } = globalThis.STORY;
   const ASSETS = globalThis.STORY.assets ?? ""; // per-book folder for media/ and audio/
   const SCENES = globalThis.SCENES;
   const EMBED = globalThis.EMBED; // single-file build (tools/bundle.mjs): path -> data: URL, nothing else exists
@@ -12,6 +12,17 @@
   const VIDEO = params.has("video"); // set by tools/record-video.mjs
   const DURS = (params.get("durs") || "").split(",").map(Number).filter(Boolean); // seconds per page
 
+  // ---------- language: ?lang=en|et, else the choice saved by the landing page or this toggle ----------
+  // Estonian is the default; pages carry `en` text, motion.js translates chapter cards and stickers.
+  const LANG_KEY = "lastenurk.lang";
+  const UI = {
+    et: { prev: "Eelmine lehekülg", read: "Loe ette", auto: "Loe terve raamat ette", next: "Järgmine lehekülg", lang: "In English", home: "Tagasi lastenurka" },
+    en: { prev: "Previous page", read: "Read aloud", auto: "Read the whole book", next: "Next page", lang: "Eesti keeles", home: "Back to the kids’ corner" },
+  };
+  const store = (k, v) => { try { return v === undefined ? localStorage.getItem(k) : localStorage.setItem(k, v); } catch { return null; } };
+  let lang = VIDEO ? "et" : [params.get("lang"), store(LANG_KEY)].find((l) => l in UI) ?? "et";
+  const textOf = (p) => (lang === "en" && p.en) || p.text;
+
   const $ = (id) => document.getElementById(id);
   const sceneEl = $("scene"), textEl = $("text"), dotsEl = $("dots"), fxEl = $("fx");
   const pad = (i) => String(i).padStart(2, "0");
@@ -22,6 +33,25 @@
   let advanceTimer = null;
 
   if (VIDEO) document.body.classList.add("video");
+
+  // On the published site (/books/<name>/) a home button leads back to the landing page
+  const ON_SITE = /^https?:$/.test(location.protocol) && /\/books\/[^/]+\/(index\.html)?$/.test(location.pathname);
+  if (ON_SITE && !VIDEO) document.body.classList.add("has-home");
+
+  function applyLang() {
+    document.documentElement.lang = lang;
+    document.title = lang === "en" ? TITLE_EN : TITLE;
+    for (const id of ["prev", "read", "auto", "next", "lang", "home"]) $(id).setAttribute("aria-label", UI[lang][id]);
+    $("lang").textContent = lang === "en" ? "ET" : "EN";
+    $("home").href = `../../?lang=${lang}`;
+  }
+  function setLang(l) {
+    lang = l;
+    store(LANG_KEY, l);
+    applyLang();
+    go(page);
+  }
+  applyLang();
   dotsEl.innerHTML = PAGES.map(() => "<span></span>").join("");
 
   // ---------- media: web/media/pNN.(mp4|webm|png|jpg|webp) replaces the SVG drawing ----------
@@ -78,7 +108,7 @@
     textEl.className = isTitle ? "title" : "";
     // Wrap words so speech-synthesis word boundaries can highlight them
     let pos = 0, n = 0;
-    textEl.innerHTML = p.text
+    textEl.innerHTML = textOf(p)
       .split(/(\s+)/)
       .map((tok) => {
         const start = pos;
@@ -103,7 +133,7 @@
     if (!VIDEO && autoRead) setTimeout(() => page === i && narrate(), 900 + (MOTION?.introSeconds(i) ?? 0) * 1000);
   }
 
-  // ---------- narration: web/audio/pNN.(mp3|wav), else browser Estonian voice ----------
+  // ---------- narration: web/audio/pNN.(mp3|wav), else the browser's voice for the language ----------
   function stopNarration() {
     clearTimeout(advanceTimer);
     if (audio) { audio.pause(); audio = null; }
@@ -122,7 +152,7 @@
     stopNarration();
     const i = page;
     $("read").classList.add("on");
-    for (const ext of ["mp3", "wav"]) {
+    for (const ext of lang === "et" ? ["mp3", "wav"] : []) { // recorded narration is Estonian
       const src = asset(`${ASSETS}audio/p${pad(i)}.${ext}`);
       if (!src) continue;
       const a = new Audio(src);
@@ -140,10 +170,11 @@
 
   function speakFallback(i) {
     if (!("speechSynthesis" in window)) return finished(i);
-    const u = new SpeechSynthesisUtterance(PAGES[i].text);
-    u.lang = "et-EE";
+    const u = new SpeechSynthesisUtterance(textOf(PAGES[i]));
+    u.lang = lang === "en" ? "en-GB" : "et-EE";
     u.rate = 0.85;
-    const voice = speechSynthesis.getVoices().find((v) => v.lang.toLowerCase().startsWith("et"));
+    const voices = speechSynthesis.getVoices();
+    const voice = voices.find((v) => v.lang.replace("_", "-") === u.lang) ?? voices.find((v) => v.lang.toLowerCase().startsWith(lang));
     if (voice) u.voice = voice;
     u.onboundary = (e) => {
       textEl.querySelectorAll(".w").forEach((w) => w.classList.toggle("on", +w.dataset.at <= e.charIndex && e.charIndex < +w.dataset.at + w.textContent.length));
@@ -199,6 +230,7 @@
   $("next").onclick = () => go(page + 1);
   $("read").onclick = () => narrate();
   $("auto").onclick = () => setAuto(!autoRead);
+  $("lang").onclick = () => setLang(lang === "en" ? "et" : "en");
 
   addEventListener("keydown", (e) => {
     if (e.key === "ArrowRight" || e.key === " ") go(page + 1);
@@ -208,7 +240,7 @@
   let touchX = null;
   $("stage").addEventListener("pointerdown", (e) => { touchX = e.clientX; });
   $("stage").addEventListener("pointerup", (e) => {
-    if (e.target.closest("button")) return;
+    if (e.target.closest("button, a")) return;
     const dx = e.clientX - (touchX ?? e.clientX);
     if (Math.abs(dx) > 60) go(page + (dx < 0 ? 1 : -1));
     else burst(e);

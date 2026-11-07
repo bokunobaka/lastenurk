@@ -150,6 +150,7 @@ body.v2 #text.title .ch { display: inline-block; animation: letterDrop .8s calc(
 
 /* ---------- progress crown ---------- */
 #prog { position: absolute; top: 4.4%; left: 3%; width: 30%; height: 1cqh; border-radius: 1cqh; background: rgba(255,255,255,.55); }
+body.has-home #prog { left: calc(4% + 9cqh); }
 #prog-fill { position: absolute; left: 0; top: 0; bottom: 0; border-radius: 1cqh; background: linear-gradient(90deg, #ff8fbf, #a66cff); }
 #prog-crown { position: absolute; top: 50%; width: 5cqh; height: 5cqh; margin: -3cqh 0 0 -2.5cqh; }
 #prog-crown svg { width: 100%; height: 100%; overflow: visible; filter: drop-shadow(0 .3cqh .4cqh rgba(80,30,120,.35)); }

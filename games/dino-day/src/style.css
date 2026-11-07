@@ -252,6 +252,28 @@ button {
 #title .card {
   pointer-events: auto;
 }
+/* back to the lastenurk landing page (shown only when the game is served from there) */
+#cornerBtn {
+  position: fixed;
+  top: max(12px, env(safe-area-inset-top));
+  left: max(12px, env(safe-area-inset-left));
+  width: 56px;
+  height: 56px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  font-size: 26px;
+  text-decoration: none;
+  pointer-events: auto;
+  background: rgba(255, 255, 255, 0.92);
+  box-shadow: 0 5px 0 color-mix(in srgb, var(--pink) 35%, transparent), 0 8px 18px rgba(0, 0, 0, 0.15);
+}
+#cornerBtn[hidden] {
+  display: none;
+}
+#cornerBtn:active {
+  transform: translateY(3px);
+}
 #end {
   background: rgba(255, 230, 242, 0.3);
 }

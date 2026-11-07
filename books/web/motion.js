@@ -53,7 +53,14 @@
     wake: [["TERE HOMMIKUST!", "#ff8a00", 66, 16]],
   };
   // Words highlighted in the text: these everywhere, plus the words of the page's own stickers
-  const SOUND_WORDS = ["viuh", "hopp", "hopp-hopp-hopp", "amps", "kõrgele-kõrgele"];
+  const SOUND_WORDS = ["viuh", "hopp", "hopp-hopp-hopp", "amps", "kõrgele-kõrgele", "whoosh", "hop", "hop-hop-hop", "chomp"];
+  // Sticker words in English (both books)
+  const STICKER_EN = {
+    "HOPP!": "HOP!", "VIUH!": "WHOOSH!", "AMPS!": "CHOMP!", "AMPS-AMPS!": "CHOMP-CHOMP!", "ÜKS!": "ONE!", "KAKS!": "TWO!", "KOLM!": "THREE!",
+    "TERE!": "HELLO!", "TERE HOMMIKUST!": "GOOD MORNING!", "PÕMM!": "BOOM!", "LIRTS!": "SPLISH!", "LÄRTS!": "SPLASH!",
+    "LEIDSIN!": "FOUND YOU!", "KRÕMPS!": "CRUNCH!", "KRÕMPS-KRÕMPS!": "CRUNCH-CRUNCH!", "TRAMPSTI!": "STOMP!", "LÜRPS!": "SLURP!",
+  };
+  const english = () => document.documentElement.lang === "en"; // set by book.js
   const bare = (w) => w.toLowerCase().replace(/[^\p{L}-]/gu, "");
 
   const TRANSITIONS = ["iris", "star", "wipe", "push"];
@@ -61,7 +68,8 @@
   const CARD_COLORS = { sun: "#ffb54d", ball: "#ff6f9f", bowl: "#5fc3a0", dragon: "#8e6cff", longneck: "#f0a83c", moon: "#3b3570" };
 
   // Pages may carry their own camera / particles / stickers (other books); else the tables above
-  const stickerList = (i) => PAGES[i].stickers || STICKERS[PAGES[i].scene] || [];
+  const stickerList = (i) => (PAGES[i].stickers || STICKERS[PAGES[i].scene] || [])
+    .map(([text, ...rest]) => [english() ? STICKER_EN[text] ?? text : text, ...rest]);
   const intro = (i) => (PAGES[i].chapter ? CHAPTER_CARD : 0);
 
   // deterministic random per page, so the video and the book always match
@@ -111,7 +119,7 @@
     card.className = "card";
     card.style.setProperty("--bg", CARD_COLORS[ch.icon] || "#ff6f9f");
     card.style.setProperty("--life", `${CHAPTER_CARD}s`);
-    const letters = [...ch.title].map((c, k) => `<span style="--c:${k}">${c === " " ? "&nbsp;" : c}</span>`).join("");
+    const letters = [...((english() && ch.en) || ch.title)].map((c, k) => `<span style="--c:${k}">${c === " " ? "&nbsp;" : c}</span>`).join("");
     card.innerHTML = `<div class="rings"><i></i><i></i><i></i><i></i></div>
       <div class="icon">${ICONS[ch.icon] || ""}</div><h2>${letters}</h2>`;
     layer.append(card);

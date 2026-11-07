@@ -83,6 +83,20 @@
     .meta span { background: var(--tint); border-radius: 999px; padding: 2px 12px 0; font-size: .95rem; }
     .pink   { --edge: #ffb3d4; --tint: #ffe3f0; }
     .green  { --edge: #a7dd8f; --tint: #e3f6d8; }
+    .langs {
+      position: absolute; top: clamp(12px, 2vw, 20px); right: clamp(12px, 2vw, 20px);
+      display: flex; gap: 6px; padding: 5px;
+      background: rgba(255, 255, 255, .8); border-radius: 999px;
+      box-shadow: 0 3px 0 #f1d6b8;
+    }
+    .langs button {
+      font: inherit; font-weight: 800; font-size: 1rem; color: var(--ink);
+      border: 0; border-radius: 999px; padding: 6px 14px 3px; min-height: 40px;
+      background: transparent; cursor: pointer;
+    }
+    .langs button[aria-pressed="true"] { background: #ffd6ea; }
+    .langs button:focus-visible { outline: 3px solid var(--ink); outline-offset: 2px; }
+    @media (max-width: 640px) { main { padding-top: 72px; } }
     footer { margin-top: 48px; text-align: center; color: var(--soft); font-size: 1rem; }
     footer a { color: inherit; }
     @keyframes bob { 50% { transform: translateY(-6px); } }
@@ -93,62 +107,89 @@
   </style>
 </head>
 <body>
+  <div class="langs" role="group" aria-label="Keel / Language">
+    <button type="button" data-lang="et" lang="et">Eesti</button>
+    <button type="button" data-lang="en" lang="en">English</button>
+  </div>
   <main>
     <header>
       <h1><span>🧸</span> Lastenurk <span>🦕</span></h1>
-      <p>Pildiraamatud ja mängud 4–6-aastastele, eesti keeles</p>
+      <p data-en="Picture books and games for ages 4–6, in Estonian and English">Pildiraamatud ja mängud 4–6-aastastele, eesti ja inglise keeles</p>
     </header>
 
     <!-- To add a book or game: add a card here and a 16:9 picture in thumbs/.
          Games live in games/<name>/ and books in books/ (see the README). -->
     <section aria-labelledby="h-books">
-      <h2 id="h-books">📖 Raamatud</h2>
+      <h2 id="h-books" data-en="📖 Books">📖 Raamatud</h2>
       <div class="grid">
         <a class="card pink" href="books/printsess-frida/">
-          <div class="thumb"><img src="thumbs/printsess-frida.webp" alt="" loading="lazy" /><span class="tag">📖 Raamat</span></div>
+          <div class="thumb"><img src="thumbs/printsess-frida.webp" alt="" loading="lazy" /><span class="tag" data-en="📖 Book">📖 Raamat</span></div>
           <div class="body">
-            <div class="title">Printsess Frida päev</div>
-            <div class="desc">Frida ja tema sõbrad mängivad palli, lasevad liugu, söövad ploome ja äratavad ellu suure võlulohe.</div>
-            <div class="meta"><span>24 lehte</span><span>🔊 loeb ette</span><span>4–6 a</span></div>
+            <div class="title" data-en="Princess Frida’s Day">Printsess Frida päev</div>
+            <div class="desc" data-en="Frida and her friends play ball, go down the slide, eat plums and wake up a big magic dragon.">Frida ja tema sõbrad mängivad palli, lasevad liugu, söövad ploome ja äratavad ellu suure võlulohe.</div>
+            <div class="meta"><span data-en="24 pages">24 lehte</span><span data-en="🔊 reads aloud">🔊 loeb ette</span><span data-en="ages 4–6">4–6 a</span></div>
           </div>
         </a>
         <a class="card green" href="books/rexi-paev/">
-          <div class="thumb"><img src="thumbs/rexi-paev.webp" alt="" loading="lazy" /><span class="tag">📖 Raamat</span></div>
+          <div class="thumb"><img src="thumbs/rexi-paev.webp" alt="" loading="lazy" /><span class="tag" data-en="📖 Book">📖 Raamat</span></div>
           <div class="body">
-            <div class="title">Väikese Rexi päev</div>
-            <div class="desc">Väike T-rex Rex hüppab sõpradega porilompides, mängib peitust ja laseb liugu mööda suure Bruuno kaela.</div>
-            <div class="meta"><span>24 lehte</span><span>🔊 loeb ette</span><span>4–6 a</span></div>
+            <div class="title" data-en="Little Rex’s Day">Väikese Rexi päev</div>
+            <div class="desc" data-en="Little T-rex Rex jumps in mud puddles with his friends, plays hide-and-seek and slides down big Bruuno’s neck.">Väike T-rex Rex hüppab sõpradega porilompides, mängib peitust ja laseb liugu mööda suure Bruuno kaela.</div>
+            <div class="meta"><span data-en="24 pages">24 lehte</span><span data-en="🔊 reads aloud">🔊 loeb ette</span><span data-en="ages 4–6">4–6 a</span></div>
           </div>
         </a>
       </div>
     </section>
 
     <section aria-labelledby="h-games">
-      <h2 id="h-games">🎮 Mängud</h2>
+      <h2 id="h-games" data-en="🎮 Games">🎮 Mängud</h2>
       <div class="grid">
         <a class="card pink" href="games/princess-day/">
-          <div class="thumb"><img src="thumbs/princess-day.webp" alt="" loading="lazy" /><span class="tag">🎮 Mäng</span></div>
+          <div class="thumb"><img src="thumbs/princess-day.webp" alt="" loading="lazy" /><span class="tag" data-en="🎮 Game">🎮 Mäng</span></div>
           <div class="body">
-            <div class="title">Printsessi päev</div>
-            <div class="desc">3D-mäng: kuusteist päeva lossis ja aias. Lugeda pole vaja – ülesanded on piltidena.</div>
-            <div class="meta"><span>16 päeva</span><span>👆 puuduta või juhtkang</span><span>4–6 a</span></div>
+            <div class="title" data-en="Princess Day">Printsessi päev</div>
+            <div class="desc" data-en="A 3D game: sixteen days in the castle and garden. No reading needed – the tasks are pictures.">3D-mäng: kuusteist päeva lossis ja aias. Lugeda pole vaja – ülesanded on piltidena.</div>
+            <div class="meta"><span data-en="16 days">16 päeva</span><span data-en="👆 tap or joystick">👆 puuduta või juhtkang</span><span data-en="ages 4–6">4–6 a</span></div>
           </div>
         </a>
         <a class="card green" href="games/dino-day/">
-          <div class="thumb"><img src="thumbs/dino-day.webp" alt="" loading="lazy" /><span class="tag">🎮 Mäng</span></div>
+          <div class="thumb"><img src="thumbs/dino-day.webp" alt="" loading="lazy" /><span class="tag" data-en="🎮 Game">🎮 Mäng</span></div>
           <div class="body">
-            <div class="title">Dinopäev</div>
-            <div class="desc">3D-mäng: kuusteist päeva dinosauruste maailmas – munad, mütsid, sõbrad ja lemmikloom.</div>
-            <div class="meta"><span>16 päeva</span><span>👆 puuduta või juhtkang</span><span>4–6 a</span></div>
+            <div class="title" data-en="Dino Day">Dinopäev</div>
+            <div class="desc" data-en="A 3D game: sixteen days in the world of dinosaurs – eggs, hats, friends and a pet.">3D-mäng: kuusteist päeva dinosauruste maailmas – munad, mütsid, sõbrad ja lemmikloom.</div>
+            <div class="meta"><span data-en="16 days">16 päeva</span><span data-en="👆 tap or joystick">👆 puuduta või juhtkang</span><span data-en="ages 4–6">4–6 a</span></div>
           </div>
         </a>
       </div>
     </section>
 
     <footer>
-      Tasuta ja ilma reklaamideta.
+      <span data-en="Free and without ads.">Tasuta ja ilma reklaamideta.</span>
       · <a href="https://github.com/bokunobaka/lastenurk">GitHub</a>
     </footer>
   </main>
+  <script>
+    // Language: Estonian by default; English swaps in each element's data-en text.
+    // The choice is saved (books read the same key) and passed to every book and game as ?lang=.
+    (() => {
+      const KEY = "lastenurk.lang";
+      const store = (v) => { try { return v === undefined ? localStorage.getItem(KEY) : localStorage.setItem(KEY, v); } catch { return null; } };
+      const q = new URLSearchParams(location.search).get("lang");
+      const texts = [...document.querySelectorAll("[data-en]")].map((el) => [el, el.textContent, el.dataset.en]);
+      const cards = [...document.querySelectorAll("a.card")].map((a) => [a, a.getAttribute("href")]);
+      const titles = { et: document.title, en: "Kids’ corner · books and games" };
+      function set(lang) {
+        document.documentElement.lang = lang;
+        document.title = titles[lang];
+        for (const [el, et, en] of texts) el.textContent = lang === "en" ? en : et;
+        for (const b of document.querySelectorAll(".langs button")) b.setAttribute("aria-pressed", b.dataset.lang === lang);
+        for (const [a, href] of cards) a.setAttribute("href", `${href}?lang=${lang}`);
+        store(lang);
+      }
+      for (const b of document.querySelectorAll(".langs button")) b.onclick = () => set(b.dataset.lang);
+      set(q === "en" || q === "et" ? q : store() === "en" ? "en" : "et");
+      if (q) history.replaceState(null, "", location.pathname);
+    })();
+  </script>
 </body>
 </html>

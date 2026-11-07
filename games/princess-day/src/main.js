@@ -2,6 +2,7 @@ import './style.css';
 import { Game } from './game.js';
 import { ui } from './ui.js';
 import { say } from './speech.js';
+import { lang } from './i18n.js';
 
 ui.init();
 const game = new Game(document.getElementById('c'));
@@ -22,6 +23,13 @@ game.init().then(() => {
     game.state = 'play';
   }
 });
+
+// on the lastenurk site (/games/<name>/) the title screen gets a button back to the landing page
+if (/\/games\/[^/]+\/(index\.html)?$/.test(location.pathname)) {
+  const corner = document.getElementById('cornerBtn');
+  corner.href = `../../?lang=${lang}`;
+  corner.hidden = false;
+}
 
 // offline support: only in the built game (the dev server would cache stale code)
 if (import.meta.env.PROD && 'serviceWorker' in navigator) {

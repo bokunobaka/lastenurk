@@ -18,6 +18,7 @@ const STR = {
     'aria.dress': 'kleit',
     'aria.crown': 'kroon',
     'aria.done': 'Valmis',
+    'aria.corner': 'Tagasi lastenurka',
     'wardrobe.pick': 'Vali kleit ja kroon!',
 
     'animal.bunny': 'Jänku',
@@ -330,6 +331,7 @@ const STR = {
     'aria.dress': 'dress',
     'aria.crown': 'crown',
     'aria.done': 'Done',
+    'aria.corner': 'Back to the kids’ corner',
     'wardrobe.pick': 'Pick a dress and a crown!',
 
     'animal.bunny': 'Bunny',

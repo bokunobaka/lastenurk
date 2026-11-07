@@ -41,6 +41,14 @@ The dinosaur book keeps its media and narration in `web/dino/media/` and `web/di
 
 Page numbers: `p00` = cover … `p23` = "Lõpp" (see `story/lugu.md`).
 
+## English
+
+Both books can be read in English: the **EN/ET** button in the book, `?lang=en`, or the language switch on
+the landing page (saved in `localStorage` as `lastenurk.lang`). English text is the `en` field of each page in
+`web/story.js` / `web/dino-story.js`; chapter titles have `en`, and sticker words are translated in `STICKER_EN`
+(`web/motion.js`). English is read by the device's English voice (recorded narration is Estonian only).
+Videos and the narration tool always use Estonian.
+
 ## Web book
 
 Open `web/index.html` in a browser (double-click works; no server needed).

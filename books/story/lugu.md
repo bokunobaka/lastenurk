@@ -1,9 +1,9 @@
 # Printsess Frida päev
 
 Estonian text for a 5-year-old reader: short sentences, sound words (*viuh, hopp, amps*) that are fun to read aloud.
-The source of truth used by the web book and video is `web/story.js`; edit there, then update this file.
+The source of truth used by the web book and video is `web/story.js` (`text` and `en` per page); edit there, then update this file.
 
-| # | Eesti keeles | English (for reference) |
+| # | Eesti keeles | English |
 |---|---|---|
 | 0 | **Printsess Frida päev** | Princess Frida's Day |
 | 1 | Hommikul paistis päike aknast sisse. Printsess Frida ärkas üles, sirutas käsi ja haigutas: „Tere hommikust!” | In the morning the sun shone through the window. Princess Frida woke up, stretched her arms and yawned: "Good morning!" |
@@ -12,8 +12,8 @@ The source of truth used by the web book and video is `web/story.js`; edit there
 | 4 | Frida istus pehmesse tugitooli ja luges raamatuid. Raamatutes olid lohed, haldjad ja üks väga naljakas konn. | Frida sat in a soft armchair and read books. In the books there were dragons, fairies and one very funny frog. |
 | 5 | Õuest kostis naeru. Seal ootasid Fridat tema sõbrad: Mia, Lenna, Eliise ja Kertu. „Tule mängima!” hüüdsid nad. | Laughter came from outside. Her friends Mia, Lenna, Eliise and Kertu were waiting. "Come and play!" they called. |
 | 6 | Printsessid mängisid palli. Pall lendas kõrgele-kõrgele ja kõik jooksid palli järele. Hopp! | The princesses played ball. The ball flew high, high up and everyone ran after it. Hop! |
-| 7 | Siis jooksid nad suurele mänguväljakule. Seal oli väga kõrge liumägi! Üksteise järel lasid printsessid alla: viuh, viuh, viuh, viuh, viuh! | Then they ran to the big playground. There was a very tall slide! One after another the princesses slid down: whoosh ×5! |
-| 8 | Järgmisena läksid nad hüppelossi. Seal sai hüpata, roomata läbi tunnelite ja lasta liumäest alla. Hopp-hopp-hopp! | Next they went to the bouncy castle. You could jump, crawl through tunnels and go down the slide. Bounce-bounce-bounce! |
+| 7 | Siis jooksid nad suurele mänguväljakule. Seal oli väga kõrge liumägi! Üksteise järel lasid printsessid alla: viuh, viuh, viuh, viuh, viuh! | Then they ran to the big playground. There was a very tall slide! One after another the princesses slid down: whoosh, whoosh, whoosh, whoosh, whoosh! |
+| 8 | Järgmisena läksid nad hüppelossi. Seal sai hüpata, roomata läbi tunnelite ja lasta liumäest alla. Hopp-hopp-hopp! | Next they went to the bouncy castle. You could jump, crawl through tunnels and go down the slide. Hop-hop-hop! |
 | 9 | Aias kasvas suur ploomipuu. Printsessid ronisid puu otsa ja korjasid küpseid lillasid ploome. Amps! Kui magusad! | A big plum tree grew in the garden. The princesses climbed up and picked ripe purple plums. Chomp! So sweet! |
 | 10 | Varsti oli lõunaaeg. Printsessid lehvitasid üksteisele: „Head aega! Homme mängime jälle!” Ja kõik läksid koju. | Soon it was lunchtime. The princesses waved: "Goodbye! Let's play again tomorrow!" And everyone went home. |
 | 11 | Kodus ootas Fridat soe lõunasöök. Frida sõi kõhu täis ja ütles: „Aitäh, oli väga maitsev!” | A warm lunch was waiting for Frida at home. She ate until she was full and said: "Thank you, it was delicious!" |

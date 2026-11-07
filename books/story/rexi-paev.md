@@ -1,9 +1,9 @@
 # Väikese Rexi päev
 
 The dinosaur book: same rhythm as *Printsess Frida päev* (wake up, play, lunch, nap, the big friend, evening, sleep), same length (24 pages).
-The source of truth is `web/dino-story.js`. Edit there, then update this file.
+The source of truth is `web/dino-story.js` (`text` and `en` per page). Edit there, then update this file.
 
-| # | Eesti keeles | English (for reference) |
+| # | Eesti keeles | English |
 |---|---|---|
 | 0 | **Väikese Rexi päev** | Little Rex’s Day |
 | 1 | Hommikul paistis päike koopasse. Väike T-rex Rex ärkas üles, sirutas oma lühikesi käsi ja haigutas: „Tere hommikust!” | In the morning the sun shone into the cave. Little T-rex Rex woke up, stretched his short arms and yawned: “Good morning!” |
