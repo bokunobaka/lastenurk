@@ -60,14 +60,16 @@
     "TERE!": "HELLO!", "TERE HOMMIKUST!": "GOOD MORNING!", "PÕMM!": "BOOM!", "LIRTS!": "SPLISH!", "LÄRTS!": "SPLASH!",
     "LEIDSIN!": "FOUND YOU!", "KRÕMPS!": "CRUNCH!", "KRÕMPS-KRÕMPS!": "CRUNCH-CRUNCH!", "TRAMPSTI!": "STOMP!", "LÜRPS!": "SLURP!",
     "PRITSTI!": "SPLASH!", "UU-AA!": "OO-AA!", "NOKK-NOKK!": "PECK-PECK!", "MÄÄ!": "BAA!", "KOPP-KOPP!": "CLIP-CLOP!",
-    "SULPSTI!": "SPLOSH!", "NÄMM!": "YUM!",
+    "SULPSTI!": "SPLOSH!", "NÄMM!": "YUM!", "PLÄRTS!": "SPLAT!", "KÄÄ-KÄÄ!": "SQUAWK!", "LIMPS-LIMPS!": "LICK-LICK!",
+    "VURR-VURR!": "WHIRR-WHIRR!", "HIHII!": "HEE-HEE!", "KRÕKS-KRÕKS!": "CRUNCH-CRUNCH!", "PÕMAKI!": "BUMP!",
+    "MMM!": "MMM!", "TUKS-TUKS!": "BA-DUM!", "AAAA!": "AHHH!",
   };
   const english = () => document.documentElement.lang === "en"; // set by book.js
   const bare = (w) => w.toLowerCase().replace(/[^\p{L}-]/gu, "");
 
   const TRANSITIONS = ["iris", "star", "wipe", "push"];
   const PALETTE = ["#ff5c8a", "#a66cff", "#ffb000", "#2f9bff", "#2fb37a"];
-  const CARD_COLORS = { sun: "#ffb54d", ball: "#ff6f9f", bowl: "#5fc3a0", dragon: "#8e6cff", longneck: "#f0a83c", paw: "#ff8a65", moon: "#3b3570" };
+  const CARD_COLORS = { sun: "#ffb54d", ball: "#ff6f9f", bowl: "#5fc3a0", dragon: "#8e6cff", longneck: "#f0a83c", paw: "#ff8a65", wave: "#3fa9e8", star: "#ff6fa8", snow: "#6fb6e8", heart: "#ff7a8a", moon: "#3b3570" };
 
   // Pages may carry their own camera / particles / stickers (other books); else the tables above
   const stickerList = (i) => (PAGES[i].stickers || STICKERS[PAGES[i].scene] || [])
@@ -100,7 +102,7 @@
     const kind = PAGES[i].particles || PARTICLES[PAGES[i].scene];
     if (!kind) return;
     const r = rng(i * 7919 + 1);
-    const count = { star: 26, glitter: 22, firefly: 16, bubble: 14, bokeh: 14 }[kind] ?? 22;
+    const count = { star: 26, glitter: 22, firefly: 16, bubble: 14, bokeh: 14, snow: 40 }[kind] ?? 22;
     const box = document.createElement("div");
     box.className = `particles ${kind}`;
     for (let k = 0; k < count; k++) {
@@ -165,6 +167,10 @@
     paw: `<svg viewBox="-60 -60 120 120"><g transform="rotate(-12)"><ellipse cx="0" cy="14" rx="30" ry="26" fill="#fff"/>
       <ellipse cx="-34" cy="-14" rx="11" ry="14" fill="#fff"/><ellipse cx="-13" cy="-34" rx="11" ry="14" fill="#fff"/>
       <ellipse cx="13" cy="-34" rx="11" ry="14" fill="#fff"/><ellipse cx="34" cy="-14" rx="11" ry="14" fill="#fff"/></g></svg>`,
+    wave: `<svg viewBox="-60 -60 120 120"><path d="M-56 10 Q-42 -30 -14 -24 Q-36 -10 -20 8 Q0 -40 30 -20 Q8 -10 22 8 Q40 -16 56 10 V50 H-56 Z" fill="#fff"/></svg>`,
+    star: `<svg viewBox="-60 -60 120 120"><g class="spin"><path d="M0 -52 L14 -18 L50 -16 L22 8 L32 44 L0 24 L-32 44 L-22 8 L-50 -16 L-14 -18 Z" fill="#fff"/></g></svg>`,
+    snow: `<svg viewBox="-60 -60 120 120"><g class="spin" stroke="#fff" stroke-width="9" stroke-linecap="round">${[0, 60, 120].map((a) => `<path d="M0 -48 V48 M-14 -36 L0 -24 L14 -36 M-14 36 L0 24 L14 36" transform="rotate(${a})"/>`).join("")}</g></svg>`,
+    heart: `<svg viewBox="-60 -60 120 120"><path d="M0 44 C-70 0 -48 -52 0 -24 C48 -52 70 0 0 44 Z" fill="#fff"><animateTransform attributeName="transform" type="scale" values="1;1.12;1" dur=".9s" repeatCount="indefinite"/></path></svg>`,
     moon: `<svg viewBox="-60 -60 120 120"><circle r="40" fill="#fff6c9"/><circle cx="18" cy="-12" r="36" fill="var(--bg)"/><g class="twinkle"><circle cx="34" cy="30" r="4" fill="#fff"/><circle cx="-40" cy="-36" r="3" fill="#fff"/></g></svg>`,
   };
 

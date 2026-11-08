@@ -15,17 +15,25 @@ Both come in two styles:
 
   The v2 tuning (camera paths, particles, stickers) lives in `web/motion.js` and `web/motion.css`. Chapters are set in `web/story.js`.
 
-## Three books
+## Books
 
 | Book | Open | Story text |
 |---|---|---|
 | **Printsess Frida päev** | `web/index.html` (v1), `web/v2.html` (motion graphics) | `web/story.js` |
 | **Väikese Rexi päev** (dinosaurs) | `web/dino.html` (motion graphics) | `web/dino-story.js`, `web/dino-scenes.js` |
 | **Printsess Frida loomaaias** (the zoo) | `web/zoo.html` (motion graphics) | `web/zoo-story.js`, `web/zoo-scenes.js` |
+| **Printsess Frida rannas** (the beach) | `web/beach.html` | `web/beach-story.js`, `web/beach-scenes.js` |
+| **Printsess Frida lõbustuspargis** (the funfair) | `web/funfair.html` | `web/funfair-story.js`, `web/funfair-scenes.js` |
+| **Printsess Frida kelgutamas** (sledding) | `web/winter.html` | `web/winter-story.js`, `web/winter-scenes.js` |
+| **Printsess Frida arsti juures** (the doctor) | `web/doctor.html` | `web/doctor-story.js`, `web/doctor-scenes.js` |
+
+The Frida family books share Frida's family, outfits and props from the kit in `web/scenes.js` (`SCENE_KIT`):
+`who(id, k, o)` draws ema / isa / uku / frida at family sizes; `o.swim`, `o.winter`, `o.pj` change clothes;
+`o.over` draws extras on the figure (a plaster, a sticker, sun cream); `dreamBed([...])` is the last-page bedroom.
 
 The tools take `--dino` for the dinosaur book: `npm run narrate -- --dino`, `node tools/record-video.mjs --dino`, `node tools/screenshots.mjs --dino`.
-The dinosaur book keeps its media and narration in `web/dino/media/` and `web/dino/audio/`; the zoo book in `web/zoo/`.
-`node tools/screenshots.mjs --zoo` checks the zoo book.
+The dinosaur book keeps its media and narration in `web/dino/media/` and `web/dino/audio/`; the other books in `web/<name>/`.
+`node tools/screenshots.mjs --<name>` checks a book (`--dino`, `--zoo`, `--beach`, `--funfair`, `--winter`, `--doctor`).
 
 ## Folders
 
@@ -98,6 +106,6 @@ Each page lasts as long as its narration plus 2 s. Frames are rendered one at a 
 ## Sharing
 
 `npm run bundle` builds one self-contained HTML file per book (v2 motion version):
-`dist/printsess-frida.html`, `dist/rexi-paev.html` and `dist/frida-loomaaias.html`. Scripts, styles, the Baloo 2 font and any
+one per book in `BOOKS` (`tools/bundle.mjs`), e.g. `dist/printsess-frida.html`. Scripts, styles, the Baloo 2 font and any
 files in `media/` / `audio/` are inlined, so the file works offline: send it by email or chat,
 put it on a drive, or upload it to any static host. Re-run after adding narration or art.

@@ -2,37 +2,10 @@
 (() => {
   const K = globalThis.SCENE_KIT;
   const FRIDA_SCENES = globalThis.SCENES; // the Frida book's scenes: the morning page is reused
-  const { wrap, sky, outdoor, sun, cloud, flower, bush, grass, sparkle, bob, hop, nightSky, princess, CAST, castle, bed, nightstand, windowFrame, curtains, room } = K;
-
-  // ---------- the family (character bible: art/zoo-characters.md) ----------
-  Object.assign(CAST, {
-    ema: { name: "Ema", dress: ["#4fc3b5", "#8fe3d8", "#ffd447"], shoe: "#2e8f84", hair: "#4a2c1a", hairStyle: "ponytail", jewels: ["#4fc3b5", "#ff4f9a", "#4fc3b5"] },
-    isa: { name: "Isa", outfit: "prince", dress: ["#4a7fd6", "#2f4e8a", "#ffd447"], shoe: "#5d4037", hair: "#8a5a2b", hairStyle: "short", beard: true, jewels: ["#2f9bff", "#e53935", "#2f9bff"] },
-    uku: { name: "Uku", outfit: "prince", shorts: true, dress: ["#ff9f43", "#3f7fd0", "#ffe14d"], shoe: "#3f7fd0", hair: "#6b4226", hairStyle: "short" },
-  });
-  // Sizes next to Frida (1): grown-ups are taller, Uku is about three
-  const SIZE = { isa: 1.36, ema: 1.3, frida: 1, uku: 0.78 };
-  const who = (id, k, o = {}) => princess(id, { ...o, s: SIZE[id] * k });
-
-  // hand-held things (drawn at the hand)
-  const SANDWICH = `<g transform="rotate(-10)"><rect x="-18" y="-12" width="36" height="22" rx="5" fill="#f6d28b"/><rect x="-18" y="-4" width="36" height="6" fill="#7cc46b"/><rect x="-18" y="2" width="36" height="4" fill="#ff8a80"/></g>`;
-  const cone = (c) => `<g transform="rotate(-8)"><path d="M-13 -6 L0 30 L13 -6 Z" fill="#e0a96d"/><path d="M-9 4 L6 14 M-4 -4 L10 6" stroke="#c4874a" stroke-width="2"/><circle cx="0" cy="-16" r="15" fill="${c}"/><circle cx="-5" cy="-20" r="4" fill="#fff" opacity=".6"/></g>`;
-  const BAG = `<g><path d="M-20 -6 Q0 -30 20 -6" stroke="#8d5d3b" stroke-width="4" fill="none"/><rect x="-26" y="-6" width="52" height="44" rx="10" fill="#ff8fbf"/><circle cx="0" cy="14" r="6" fill="#ffd447"/></g>`;
-
-  // ---------- helpers ----------
+  const { wrap, sky, outdoor, sun, cloud, flower, bush, grass, sparkle, bob, hop, princess, castle, room } = K;
+  const { SIZE, who, SANDWICH, cone, BAG, place, eye, cheek, swing, fence, tree, rock, balloon, starField, dreamBed } = K;
+  const zooPath = K.walkway;
   let uid = 0;
-  function place(o, inner) {
-    const { x = 0, y = 0, s = 1, flip = false } = o;
-    return `<g transform="translate(${x} ${y}) scale(${flip ? -s : s} ${s})"><g>${o.anim || ""}${inner}</g></g>`;
-  }
-  const eye = (x, y, r = 7, o = {}) =>
-    o.eyes === "closed"
-      ? `<path d="M${x - r} ${y} Q${x} ${y + r} ${x + r} ${y}" stroke="#3a2a2a" stroke-width="${Math.max(3, r / 2.2)}" fill="none" stroke-linecap="round"/>`
-      : `<ellipse cx="${x}" cy="${y}" rx="${r}" ry="${r * 1.15}" fill="#2b1d3a"><animate attributeName="ry" values="${r * 1.15};${r * 1.15};${r * 0.15};${r * 1.15}" keyTimes="0;0.93;0.96;1" dur="${4 + (o.blink || 0) * 0.7}s" repeatCount="indefinite"/></ellipse>
-         <circle cx="${x + r * 0.35}" cy="${y - r * 0.4}" r="${r * 0.35}" fill="#fff"/>`;
-  const cheek = (x, y, r = 10) => `<circle cx="${x}" cy="${y}" r="${r}" fill="#ff8fa8" opacity=".45"/>`;
-  const swing = (deg, cx, cy, dur, begin = 0) =>
-    `<animateTransform attributeName="transform" type="rotate" values="${-deg} ${cx} ${cy};${deg} ${cx} ${cy};${-deg} ${cx} ${cy}" dur="${dur}s" begin="${begin}s" repeatCount="indefinite" calcMode="spline" keySplines=".45 0 .55 1;.45 0 .55 1"/>`;
 
   // ---------- animals (facing right, feet at 0,0) ----------
   function giraffe(o = {}) {
@@ -253,29 +226,10 @@
   }
 
   // ---------- scenery ----------
-  const zooPath = (y = 760, c = "#f2ddb3") => `<path d="M0 ${y} Q800 ${y - 40} 1600 ${y} V900 H0 Z" fill="${c}"/>`;
-  function fence(y, x0 = -20, x1 = 1620, c = "#c58b5a") {
-    let posts = "";
-    for (let x = x0; x <= x1; x += 90) posts += `<rect x="${x}" y="${y - 110}" width="18" height="120" rx="6" fill="${c}"/>`;
-    return `${posts}<rect x="${x0}" y="${y - 92}" width="${x1 - x0}" height="14" rx="7" fill="${c}"/><rect x="${x0}" y="${y - 46}" width="${x1 - x0}" height="14" rx="7" fill="${c}"/>`;
-  }
-  function tree(x, y, s = 1, crown = "#5cb85c") {
-    return `<g transform="translate(${x} ${y}) scale(${s})"><path d="M-22 0 L-14 -300 L14 -300 L22 0 Z" fill="#8d5d3b"/>
-      <ellipse cx="0" cy="-360" rx="170" ry="110" fill="${crown}"/><ellipse cx="-110" cy="-300" rx="90" ry="70" fill="${crown}"/><ellipse cx="110" cy="-310" rx="90" ry="70" fill="${crown}"/>
-      <ellipse cx="-30" cy="-410" rx="70" ry="50" fill="#fff" opacity=".12"/></g>`;
-  }
-  function rock(x, y, w, h, c = "#b9a58f") {
-    return `<path d="M${x - w / 2} ${y} Q${x - w / 2} ${y - h} ${x - w / 6} ${y - h} Q${x + w / 3} ${y - h * 1.08} ${x + w / 2} ${y - h * 0.4} L${x + w / 2} ${y} Z" fill="${c}"/>
-      <path d="M${x - w / 3} ${y - h * 0.7} Q${x} ${y - h * 0.86} ${x + w / 5} ${y - h * 0.75}" stroke="#fff" stroke-width="6" opacity=".25" fill="none" stroke-linecap="round"/>`;
-  }
   function pool(x, y, rx, ry, c = "#7fd0ff") {
     return `<ellipse cx="${x}" cy="${y}" rx="${rx + 14}" ry="${ry + 8}" fill="#c9b49a"/><ellipse cx="${x}" cy="${y}" rx="${rx}" ry="${ry}" fill="${c}"/>
       ${[0, 1].map((i) => `<ellipse cx="${x - rx / 3 + i * rx / 2}" cy="${y}" rx="40" ry="8" fill="none" stroke="#fff" stroke-width="4" opacity=".6">
         <animate attributeName="rx" values="10;70" dur="2.4s" begin="${i * 1.2}s" repeatCount="indefinite"/><animate attributeName="opacity" values=".8;0" dur="2.4s" begin="${i * 1.2}s" repeatCount="indefinite"/></ellipse>`).join("")}`;
-  }
-  function balloon(x, y, c, begin = 0) {
-    return `<g transform="translate(${x} ${y})"><g>${bob(14, 3, begin)}<path d="M0 50 Q-10 90 4 130" stroke="#fff" stroke-width="3" fill="none"/>
-      <ellipse cx="0" cy="0" rx="34" ry="42" fill="${c}"/><path d="M-6 40 L6 40 L0 50 Z" fill="${c}"/><ellipse cx="-12" cy="-14" rx="8" ry="12" fill="#fff" opacity=".45"/></g></g>`;
   }
   function pawPrint(x, y, s, c) {
     return `<g transform="translate(${x} ${y}) scale(${s})" fill="${c}"><ellipse cx="0" cy="8" rx="16" ry="13"/><circle cx="-17" cy="-8" r="6"/><circle cx="-6" cy="-18" r="6"/><circle cx="6" cy="-18" r="6"/><circle cx="17" cy="-8" r="6"/></g>`;
@@ -590,23 +544,16 @@
     },
 
     bedtime() {
-      const b = bed(420, 760, "#8fe3d8");
-      const bubble = (x, y, i, inner) => `<g transform="translate(${x} ${y})"><circle r="92" fill="#fff6e0" stroke="#fff" stroke-width="6"/>
-        <clipPath id="zbub${i}"><circle r="88"/></clipPath><g clip-path="url(#zbub${i})">${inner}</g>${sparkle(70, -70, 0.5, i * 0.4)}</g>`;
-      return wrap(
-        `${room("#4b4385", "#8a6f8f")}${windowFrame(1180, 140, 280, 260, nightSky(280, 260))}${curtains(1180, 140, 280, 260, "#c06aa0")}
-        ${b.back}
-        ${princess("frida", { x: 430, y: 820, s: 1.05, headOnly: true, eyes: "closed", crown: false, anim: bob(3, 3) })}
-        ${b.front}${nightstand(1130, 760)}
-        ${bubble(170, 240, 0, giraffe({ x: -140, y: 400, s: 0.7, chew: true }))}
-        ${bubble(800, 170, 1, elephant({ x: -40, y: 120, s: 0.42 }))}
-        ${bubble(1000, 420, 2, `${penguin({ x: -30, y: 70, s: 0.7 })}${penguin({ x: 40, y: 80, s: 0.6, blink: 1 })}`)}
-        ${bubble(1330, 560, 3, goat({ x: -70, y: 120, s: 0.85, baa: true }))}`,
-      );
+      return dreamBed([
+        [170, 240, giraffe({ x: -140, y: 400, s: 0.7, chew: true })],
+        [800, 170, elephant({ x: -40, y: 120, s: 0.42 })],
+        [1000, 420, `${penguin({ x: -30, y: 70, s: 0.7 })}${penguin({ x: 40, y: 80, s: 0.6, blink: 1 })}`],
+        [1330, 560, goat({ x: -70, y: 120, s: 0.85, baa: true })],
+      ]);
     },
 
     end() {
-      const stars = Array.from({ length: 40 }, (_, i) => `<circle cx="${(i * 397) % 1600}" cy="${(i * 211) % 520}" r="${2 + (i % 3)}" fill="#fff"><animate attributeName="opacity" values="1;.2;1" dur="${2 + (i % 4)}s" begin="${(i % 5) * 0.4}s" repeatCount="indefinite"/></circle>`).join("");
+      const stars = starField();
       return wrap(
         `${outdoor("zen")}${stars}<circle cx="150" cy="190" r="80" fill="#fff6c9"/><circle cx="190" cy="165" r="80" fill="url(#zen)"/>
         <g opacity=".9">${zooGate(800, 720, 1, true)}</g>

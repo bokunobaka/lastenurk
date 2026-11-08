@@ -10,6 +10,7 @@ const GOLD_EDGE = "#e0a100";
 const CAST = {
   frida: {
     name: "Frida",
+    winter: ["#ff8fbf", "#a66cff", "#ffd447"], // coat, hat/mittens/trousers, pompom
     dress: ["#f78fb3", "#a66cff", "#ffd447"], // pink bodice, purple skirt, yellow trim/sash
     dots: "#ffd447",
     pj: ["#ffd6ec", "#ffd6ec", "#ffe58a"],
@@ -51,7 +52,7 @@ function armPath(side, pose) {
   return { d: `M${m * SHOULDER[0]} ${SHOULDER[1]} L${m * ex} ${ey} L${m * hx} ${hy}`, hx: m * hx, hy };
 }
 
-function arm(side, pose, top, item = "", alt = null) {
+function arm(side, pose, top, item = "", alt = null, sleeve = SKIN, hand = SKIN) {
   const a = armPath(side, pose);
   let anim = "", handAnim = "", itemAnim = "";
   if (alt) {
@@ -62,8 +63,8 @@ function arm(side, pose, top, item = "", alt = null) {
     itemAnim = `<animateTransform attributeName="transform" type="translate" values="${a.hx} ${a.hy};${b.hx} ${b.hy};${a.hx} ${a.hy}" ${t}/>`;
   }
   return `<g>
-    <path d="${a.d}" fill="none" stroke="${SKIN}" stroke-width="13" stroke-linecap="round" stroke-linejoin="round">${anim}</path>
-    <circle cx="${a.hx}" cy="${a.hy}" r="8.5" fill="${SKIN}">${handAnim}</circle>
+    <path d="${a.d}" fill="none" stroke="${sleeve}" stroke-width="${sleeve === SKIN ? 13 : 17}" stroke-linecap="round" stroke-linejoin="round">${anim}</path>
+    <circle cx="${a.hx}" cy="${a.hy}" r="${hand === SKIN ? 8.5 : 10.5}" fill="${hand}">${handAnim}</circle>
     ${item ? `<g transform="translate(${a.hx} ${a.hy})">${itemAnim}${item}</g>` : ""}
     <circle cx="${(side === "l" ? -1 : 1) * SHOULDER[0]}" cy="${SHOULDER[1]}" r="13" fill="${top}"/>
   </g>`;
@@ -135,23 +136,41 @@ function crownSvg(c) {
 /**
  * Draw a princess with her feet at (x, y). Cast members with `outfit: "prince"` get a tunic and trousers
  * (`shorts: true` for little ones) instead of a dress; `jewels` gives the big three-jewel crown.
- * o: { x, y, s, flip, pj, sit, l, r (arm poses), lAlt/rAlt {pose,dur,begin}, lItem/rItem, eyes, mouth, headOnly, anim, crown }
+ * o: { x, y, s, flip, pj, sit, l, r (arm poses), lAlt/rAlt {pose,dur,begin}, lItem/rItem, eyes, mouth, headOnly, anim, crown,
+ *      swim (swimsuit / trunks), winter (coat, hat, scarf, mittens: colours from the cast's `winter`), over (SVG drawn on top) }
  */
 function princess(id, o = {}) {
   const c = CAST[id];
   const { x = 0, y = 0, s = 1, flip = false, pj = false, sit = false, l = "stand", r = "stand", headOnly = false } = o;
-  const crown = o.crown ?? !pj;
+  const swim = !pj && o.swim, winter = !pj && !swim && o.winter;
+  const crown = o.crown ?? (!pj && !winter);
   const [top, skirt, trim] = pj ? c.pj : c.dress;
+  const [coat, warm, pom] = c.winter || [top, trim, "#fff"];
+  const prince = c.outfit === "prince";
+  const hat = winter
+    ? `<path d="M-43 -260 Q-46 -314 0 -316 Q46 -314 43 -260 Z" fill="${warm}"/><rect x="-47" y="-274" width="94" height="20" rx="10" fill="${coat}"/>
+       <circle cx="0" cy="-320" r="14" fill="${pom}"/>`
+    : "";
   const tf = `translate(${x} ${y}) scale(${flip ? -s : s} ${s})`;
 
   const head = `${hairBack(c)}<rect x="-7" y="-206" width="14" height="14" fill="${SKIN}"/>
     <circle cx="0" cy="-238" r="40" fill="${SKIN}"/>${face(c, o)}${hairFront(c)}${crown ? crownSvg(c) : ""}`;
-  if (headOnly) return `<g transform="${tf}"><g>${o.anim || ""}${head}</g></g>`;
+  if (headOnly) return `<g transform="${tf}"><g>${o.anim || ""}${head}${hat}${o.over || ""}</g></g>`;
 
   let legs;
-  if (sit) {
+  // dresses reach the seat; coats, tunics and swimwear are shorter, so the thighs get longer and the body sits lower
+  const dressSit = !(winter || swim || prince) || pj;
+  if (sit && dressSit) {
     legs = `<rect x="-6" y="-56" width="70" height="24" rx="11" fill="${pj ? top : SKIN}"/><ellipse cx="66" cy="-42" rx="10" ry="14" fill="${c.shoe}"/>`;
-  } else if (c.outfit === "prince" && !pj) {
+  } else if (sit) {
+    legs = `<path d="M-26 -96 H-6 Q50 -96 64 -76 L64 -52 H-26 Z" fill="${winter ? warm : prince && !c.shorts && !swim ? skirt : SKIN}"/><ellipse cx="68" cy="-62" rx="11" ry="15" fill="${winter ? "#6d4c41" : swim ? SKIN : c.shoe}"/>`;
+  } else if (swim) {
+    legs = `<rect x="-22" y="-112" width="16" height="108" rx="7" fill="${SKIN}"/><rect x="6" y="-112" width="16" height="108" rx="7" fill="${SKIN}"/>
+      <ellipse cx="-15" cy="-4" rx="12" ry="6" fill="${SKIN}"/><ellipse cx="15" cy="-4" rx="12" ry="6" fill="${SKIN}"/>`;
+  } else if (winter) {
+    legs = `<rect x="-25" y="-112" width="23" height="100" rx="9" fill="${warm}"/><rect x="2" y="-112" width="23" height="100" rx="9" fill="${warm}"/>
+      <rect x="-30" y="-30" width="30" height="30" rx="9" fill="#6d4c41"/><rect x="0" y="-30" width="30" height="30" rx="9" fill="#6d4c41"/>`;
+  } else if (prince && !pj) {
     const len = c.shorts ? 62 : 104;
     legs = `${c.shorts ? `<rect x="-20" y="-50" width="13" height="48" fill="${SKIN}"/><rect x="7" y="-50" width="13" height="48" fill="${SKIN}"/>` : ""}
       <rect x="-24" y="-112" width="22" height="${len}" rx="8" fill="${skirt}"/><rect x="2" y="-112" width="22" height="${len}" rx="8" fill="${skirt}"/>
@@ -165,7 +184,19 @@ function princess(id, o = {}) {
   }
 
   let body;
-  if (c.outfit === "prince" && !pj) {
+  if (swim && prince) {
+    body = `<path d="M-29 -192 Q0 -202 29 -192 L31 -110 Q0 -102 -31 -110 Z" fill="${SKIN}"/><circle cx="0" cy="-132" r="2.5" fill="#e0a98a"/>
+      <path d="M-33 -118 Q0 -126 33 -118 L34 -76 L4 -76 L0 -92 L-4 -76 L-34 -76 Z" fill="${skirt}"/><rect x="-33" y="-122" width="66" height="9" rx="4" fill="${trim}"/>`;
+  } else if (swim) {
+    body = `<path d="M-27 -192 Q0 -200 27 -192 L30 -104 Q0 -94 -30 -104 Z" fill="${top}"/>
+      <path d="M-34 -104 Q0 -92 34 -104 L38 -90 Q0 -76 -38 -90 Z" fill="${skirt}"/>
+      ${c.dots ? `<circle cx="-12" cy="-150" r="4" fill="${c.dots}"/><circle cx="12" cy="-130" r="4" fill="${c.dots}"/><circle cx="8" cy="-170" r="4" fill="${c.dots}"/>` : ""}`;
+  } else if (winter) {
+    body = `<path d="M-33 -194 Q0 -204 33 -194 Q48 -140 46 -70 Q0 -60 -46 -70 Q-48 -140 -33 -194 Z" fill="${coat}"/>
+      <path d="M-42 -150 Q0 -140 42 -150 M-45 -110 Q0 -100 45 -110" stroke="#fff" stroke-width="4" fill="none" opacity=".35"/>
+      <path d="M0 -196 V-66" stroke="#fff" stroke-width="3" opacity=".5"/>
+      <rect x="-30" y="-204" width="60" height="18" rx="9" fill="${warm}"/><path d="M14 -192 L26 -140 L12 -140 L6 -190 Z" fill="${warm}"/>`;
+  } else if (prince && !pj) {
     body = `<path d="M-29 -192 Q0 -202 29 -192 L36 -100 Q0 -92 -36 -100 Z" fill="${top}"/>
       <rect x="-34" y="-134" width="68" height="12" rx="6" fill="${trim}"/><rect x="-7" y="-136" width="14" height="16" rx="3" fill="${GOLD}"/>
       <path d="M-14 -195 Q0 -180 14 -195" stroke="${trim}" stroke-width="5" fill="none"/>`;
@@ -186,11 +217,12 @@ function princess(id, o = {}) {
   }
 
   const inner = `${hairBack(c)}${legs}${body}
-    ${arm("l", l, top, o.lItem, o.lAlt)}${arm("r", r, top, o.rItem, o.rAlt)}
+    ${["l", "r"].map((side) => arm(side, side === "l" ? l : r, winter ? coat : swim && prince ? SKIN : top, o[`${side}Item`], o[`${side}Alt`],
+      winter ? coat : SKIN, winter ? warm : SKIN)).join("")}
     <rect x="-7" y="-206" width="14" height="14" fill="${SKIN}"/>
-    <circle cx="0" cy="-238" r="40" fill="${SKIN}"/>${face(c, o)}${hairFront(c)}${crown ? crownSvg(c) : ""}`;
+    <circle cx="0" cy="-238" r="40" fill="${SKIN}"/>${face(c, o)}${hairFront(c)}${crown ? crownSvg(c) : ""}${hat}${o.over || ""}`;
 
-  return `<g transform="${tf}"><g>${o.anim || ""}<g transform="translate(0 ${sit ? 40 : 0})">${inner}</g></g></g>`;
+  return `<g transform="${tf}"><g>${o.anim || ""}<g transform="translate(0 ${sit ? (dressSit ? 40 : 60) : 0})">${inner}</g></g></g>`;
 }
 
 // ---------- small reusable pieces ----------
@@ -780,11 +812,81 @@ const SCENES = {
   },
 };
 
+// ---------- Frida's family and outing props (zoo, beach, funfair, winter and doctor books) ----------
+// Character bible: art/zoo-characters.md
+Object.assign(CAST, {
+  ema: { name: "Ema", dress: ["#4fc3b5", "#8fe3d8", "#ffd447"], shoe: "#2e8f84", hair: "#4a2c1a", hairStyle: "ponytail", jewels: ["#4fc3b5", "#ff4f9a", "#4fc3b5"], winter: ["#4fc3b5", "#ffd447", "#fff"] },
+  isa: { name: "Isa", outfit: "prince", dress: ["#4a7fd6", "#2f4e8a", "#ffd447"], shoe: "#5d4037", hair: "#8a5a2b", hairStyle: "short", beard: true, jewels: ["#2f9bff", "#e53935", "#2f9bff"], winter: ["#4a7fd6", "#e53935", "#fff"] },
+  uku: { name: "Uku", outfit: "prince", shorts: true, dress: ["#ff9f43", "#3f7fd0", "#ffe14d"], pj: ["#cfe8ff", "#cfe8ff", "#ff9f43"], shoe: "#3f7fd0", hair: "#6b4226", hairStyle: "short", winter: ["#ff9f43", "#3f7fd0", "#ffe14d"] },
+});
+// Sizes next to Frida (1): grown-ups are taller, Uku is about three
+const SIZE = { isa: 1.36, ema: 1.3, frida: 1, uku: 0.78 };
+const who = (id, k, o = {}) => princess(id, { ...o, s: (SIZE[id] ?? 1) * k });
+
+// hand-held things (drawn at the hand)
+const SANDWICH = `<g transform="rotate(-10)"><rect x="-18" y="-12" width="36" height="22" rx="5" fill="#f6d28b"/><rect x="-18" y="-4" width="36" height="6" fill="#7cc46b"/><rect x="-18" y="2" width="36" height="4" fill="#ff8a80"/></g>`;
+const cone = (c) => `<g transform="rotate(-8)"><path d="M-13 -6 L0 30 L13 -6 Z" fill="#e0a96d"/><path d="M-9 4 L6 14 M-4 -4 L10 6" stroke="#c4874a" stroke-width="2"/><circle cx="0" cy="-16" r="15" fill="${c}"/><circle cx="-5" cy="-20" r="4" fill="#fff" opacity=".6"/></g>`;
+const BAG = `<g><path d="M-20 -6 Q0 -30 20 -6" stroke="#8d5d3b" stroke-width="4" fill="none"/><rect x="-26" y="-6" width="52" height="44" rx="10" fill="#ff8fbf"/><circle cx="0" cy="14" r="6" fill="#ffd447"/></g>`;
+
+// place any drawing with its origin at (x, y)
+function place(o, inner) {
+  const { x = 0, y = 0, s = 1, flip = false } = o;
+  return `<g transform="translate(${x} ${y}) scale(${flip ? -s : s} ${s})${o.rot ? ` rotate(${o.rot})` : ""}"><g>${o.anim || ""}${inner}</g></g>`;
+}
+const eye = (x, y, r = 7, o = {}) =>
+  o.eyes === "closed"
+    ? `<path d="M${x - r} ${y} Q${x} ${y + r} ${x + r} ${y}" stroke="#3a2a2a" stroke-width="${Math.max(3, r / 2.2)}" fill="none" stroke-linecap="round"/>`
+    : `<ellipse cx="${x}" cy="${y}" rx="${r}" ry="${r * 1.15}" fill="#2b1d3a"><animate attributeName="ry" values="${r * 1.15};${r * 1.15};${r * 0.15};${r * 1.15}" keyTimes="0;0.93;0.96;1" dur="${4 + (o.blink || 0) * 0.7}s" repeatCount="indefinite"/></ellipse>
+       <circle cx="${x + r * 0.35}" cy="${y - r * 0.4}" r="${r * 0.35}" fill="#fff"/>`;
+const cheek = (x, y, r = 10) => `<circle cx="${x}" cy="${y}" r="${r}" fill="#ff8fa8" opacity=".45"/>`;
+const swing = (deg, cx, cy, dur, begin = 0) =>
+  `<animateTransform attributeName="transform" type="rotate" values="${-deg} ${cx} ${cy};${deg} ${cx} ${cy};${-deg} ${cx} ${cy}" dur="${dur}s" begin="${begin}s" repeatCount="indefinite" calcMode="spline" keySplines=".45 0 .55 1;.45 0 .55 1"/>`;
+const spin = (cx, cy, dur, reverse = false) =>
+  `<animateTransform attributeName="transform" type="rotate" from="0 ${cx} ${cy}" to="${reverse ? -360 : 360} ${cx} ${cy}" dur="${dur}s" repeatCount="indefinite"/>`;
+
+const walkway = (y = 760, c = "#f2ddb3") => `<path d="M0 ${y} Q800 ${y - 40} 1600 ${y} V900 H0 Z" fill="${c}"/>`;
+function fence(y, x0 = -20, x1 = 1620, c = "#c58b5a") {
+  let posts = "";
+  for (let x = x0; x <= x1; x += 90) posts += `<rect x="${x}" y="${y - 110}" width="18" height="120" rx="6" fill="${c}"/>`;
+  return `${posts}<rect x="${x0}" y="${y - 92}" width="${x1 - x0}" height="14" rx="7" fill="${c}"/><rect x="${x0}" y="${y - 46}" width="${x1 - x0}" height="14" rx="7" fill="${c}"/>`;
+}
+function tree(x, y, s = 1, crown = "#5cb85c") {
+  return `<g transform="translate(${x} ${y}) scale(${s})"><path d="M-22 0 L-14 -300 L14 -300 L22 0 Z" fill="#8d5d3b"/>
+    <ellipse cx="0" cy="-360" rx="170" ry="110" fill="${crown}"/><ellipse cx="-110" cy="-300" rx="90" ry="70" fill="${crown}"/><ellipse cx="110" cy="-310" rx="90" ry="70" fill="${crown}"/>
+    <ellipse cx="-30" cy="-410" rx="70" ry="50" fill="#fff" opacity=".12"/></g>`;
+}
+function rock(x, y, w, h, c = "#b9a58f") {
+  return `<path d="M${x - w / 2} ${y} Q${x - w / 2} ${y - h} ${x - w / 6} ${y - h} Q${x + w / 3} ${y - h * 1.08} ${x + w / 2} ${y - h * 0.4} L${x + w / 2} ${y} Z" fill="${c}"/>
+    <path d="M${x - w / 3} ${y - h * 0.7} Q${x} ${y - h * 0.86} ${x + w / 5} ${y - h * 0.75}" stroke="#fff" stroke-width="6" opacity=".25" fill="none" stroke-linecap="round"/>`;
+}
+function balloon(x, y, c, begin = 0) {
+  return `<g transform="translate(${x} ${y})"><g>${bob(14, 3, begin)}<path d="M0 50 Q-10 90 4 130" stroke="#fff" stroke-width="3" fill="none"/>
+    <ellipse cx="0" cy="0" rx="34" ry="42" fill="${c}"/><path d="M-6 40 L6 40 L0 50 Z" fill="${c}"/><ellipse cx="-12" cy="-14" rx="8" ry="12" fill="#fff" opacity=".45"/></g></g>`;
+}
+function starField(n = 40, h = 520) {
+  return Array.from({ length: n }, (_, i) => `<circle cx="${(i * 397) % 1600}" cy="${(i * 211) % h}" r="${2 + (i % 3)}" fill="#fff"><animate attributeName="opacity" values="1;.2;1" dur="${2 + (i % 4)}s" begin="${(i % 5) * 0.4}s" repeatCount="indefinite"/></circle>`).join("");
+}
+// The last page of every outing: Frida asleep, dreaming of the day in round bubbles.
+// bubbles: [[x, y, svg drawn around (0,0)], ...] (up to four look best)
+function dreamBed(bubbles, blanket = "#8fe3d8", extra = "") {
+  const b = bed(420, 760, blanket);
+  const bubble = ([x, y, inner], i) => `<g transform="translate(${x} ${y})"><circle r="92" fill="#fff6e0" stroke="#fff" stroke-width="6"/>
+    <clipPath id="dream${i}"><circle r="88"/></clipPath><g clip-path="url(#dream${i})">${inner}</g>${sparkle(70, -70, 0.5, i * 0.4)}</g>`;
+  return wrap(
+    `${room("#4b4385", "#8a6f8f")}${windowFrame(1180, 140, 280, 260, nightSky(280, 260))}${curtains(1180, 140, 280, 260, "#c06aa0")}
+    ${b.back}
+    ${princess("frida", { x: 430, y: 820, s: 1.05, headOnly: true, eyes: "closed", crown: false, anim: bob(3, 3) })}
+    ${b.front}${nightstand(1130, 760)}${extra}
+    ${bubbles.map(bubble).join("")}`,
+  );
+}
+
 globalThis.SCENES = SCENES;
 // Drawing kit for other books (dino-scenes.js, zoo-scenes.js)
 globalThis.SCENE_KIT = {
   wrap, sky, outdoor, room, sun, cloud, flower, bush, grass, sparkle, bob, hop, windowFrame,
   curtains, teddy, nightSky, dragon, DRAGON_RIDE, HEAD_TOP, NECK_PIVOT,
   princess, CAST, castle, bed, nightstand, SKIN, GOLD, GOLD_EDGE,
+  SIZE, who, SANDWICH, cone, BAG, place, eye, cheek, swing, spin, walkway, fence, tree, rock, balloon, starField, dreamBed,
 };
 })();

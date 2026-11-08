@@ -26,7 +26,8 @@ body.v2 #scene > .page.out { animation-play-state: paused; }
   height: calc(1.4cqh * var(--s));
   animation: var(--anim) var(--dur) var(--delay) linear infinite;
 }
-.particles.petal i, .particles.leaf i, .particles.confetti i { --anim: fall; top: -5% !important; }
+.particles.petal i, .particles.leaf i, .particles.confetti i, .particles.snow i { --anim: fall; top: -5% !important; }
+.particles.snow i { background: #fff; border-radius: 50%; box-shadow: 0 0 .6cqh rgba(255,255,255,.8); }
 .particles.petal i { background: #ffb3d1; border-radius: 100% 0; }
 .particles.leaf i { background: #6cc25b; border-radius: 100% 0; }
 .particles.confetti i { background: var(--c); width: calc(0.8cqh * var(--s)); height: calc(1.6cqh * var(--s)); border-radius: 2px; }

@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="et">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Printsess Frida lõbustuspargis</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="motion.css" />
+</head>
+<body class="v2">
+  <main id="stage" aria-live="polite">
+    <div id="scene"></div>
+    <div id="fx"></div>
+    <p id="text"></p>
+    <div id="mg"></div>
+    <div id="prog"><div id="prog-fill"></div><div id="prog-crown"><svg viewBox="-34 -46 68 56"><path d="M-25 0 L-30 -34 L-14 -16 L0 -42 L14 -16 L30 -34 L25 0 Z" fill="#ffcf33" stroke="#e0a100" stroke-width="3" stroke-linejoin="round"/><circle cx="-15" cy="-9" r="4.5" fill="#ff4f9a"/><circle cx="0" cy="-15" r="5.5" fill="#8e44ff"/><circle cx="15" cy="-9" r="4.5" fill="#ffc300"/></svg></div></div>
+
+    <a id="home" href="../../" aria-label="Tagasi lastenurka">🏠</a>
+    <nav id="controls">
+      <button id="lang" class="lang" aria-label="In English">EN</button>
+      <button id="prev" aria-label="Eelmine lehekülg">◀</button>
+      <button id="read" aria-label="Loe ette">🔊</button>
+      <button id="auto" aria-label="Loe terve raamat ette">▶</button>
+      <button id="next" aria-label="Järgmine lehekülg">▶▶</button>
+    </nav>
+    <div id="dots"></div>
+  </main>
+
+  <script src="funfair-story.js"></script>
+  <script src="scenes.js"></script>
+  <script src="funfair-scenes.js"></script>
+  <script src="motion.js"></script>
+  <script src="book.js"></script>
+</body>
+</html>

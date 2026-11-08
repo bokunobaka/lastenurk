@@ -9,6 +9,10 @@ Estonian picture books and games for ages 4–6, all in one place.
 | 📖 | **Printsess Frida päev**: picture book, 24 pages, motion graphics, read-aloud | `books/` | [/books/printsess-frida/](https://bokunobaka.github.io/lastenurk/books/printsess-frida/) |
 | 📖 | **Väikese Rexi päev**: dinosaur picture book, 24 pages | `books/` | [/books/rexi-paev/](https://bokunobaka.github.io/lastenurk/books/rexi-paev/) |
 | 📖 | **Printsess Frida loomaaias**: Frida's family day at the zoo, 21 pages | `books/` | [/books/frida-loomaaias/](https://bokunobaka.github.io/lastenurk/books/frida-loomaaias/) |
+| 📖 | **Printsess Frida rannas**: a day at the beach, 16 pages | `books/` | [/books/frida-rannas/](https://bokunobaka.github.io/lastenurk/books/frida-rannas/) |
+| 📖 | **Printsess Frida lõbustuspargis**: a day at the funfair, 15 pages | `books/` | [/books/frida-lobustuspargis/](https://bokunobaka.github.io/lastenurk/books/frida-lobustuspargis/) |
+| 📖 | **Printsess Frida kelgutamas**: sledding in the snow, 14 pages | `books/` | [/books/frida-kelgutamas/](https://bokunobaka.github.io/lastenurk/books/frida-kelgutamas/) |
+| 📖 | **Printsess Frida arsti juures**: a gentle check-up at the doctor's, 15 pages | `books/` | [/books/frida-arsti-juures/](https://bokunobaka.github.io/lastenurk/books/frida-arsti-juures/) |
 | 🎮 | **Printsessi päev**: 3D game, 16 days (three.js + Vite) | `games/princess-day/` | [/games/princess-day/](https://bokunobaka.github.io/lastenurk/games/princess-day/) |
 | 🎮 | **Dinopäev**: 3D dinosaur game, 16 days (three.js + Vite) | `games/dino-day/` | [/games/dino-day/](https://bokunobaka.github.io/lastenurk/games/dino-day/) |
 
