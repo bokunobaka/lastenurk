@@ -137,6 +137,7 @@ body.has-home #dots { left: calc(4% + 8cqh); }
 
 /* Video recording mode: no UI chrome */
 body.video #controls, body.video #dots, body.video #home { display: none; }
+body.no-voice #read, body.no-voice #auto { display: none; }
 body.video #stage { border-radius: 0; }
 
 @media (prefers-reduced-motion: reduce) {

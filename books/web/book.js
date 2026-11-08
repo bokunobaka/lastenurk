@@ -38,14 +38,31 @@
   const ON_SITE = /^https?:$/.test(location.protocol) && /\/books\/[^/]+\/(index\.html)?$/.test(location.pathname);
   if (ON_SITE && !VIDEO) document.body.classList.add("has-home");
 
+  // Estonian is read aloud only from recorded audio (the device's Estonian voice is too poor);
+  // without recordings the read buttons are hidden in Estonian. English uses the device voice.
+  let hasRecording = false;
+  probeAudio(1).then((ok) => { hasRecording = ok; applyLang(); });
+  function probeAudio(i) {
+    const srcs = ["mp3", "wav"].map((ext) => asset(`${ASSETS}audio/p${pad(i)}.${ext}`)).filter(Boolean);
+    return srcs.reduce((prev, src) => prev.then((ok) => ok || new Promise((res) => {
+      const a = new Audio();
+      a.preload = "metadata";
+      a.onloadedmetadata = () => res(true);
+      a.onerror = () => res(false);
+      a.src = src;
+    })), Promise.resolve(false));
+  }
+
   function applyLang() {
     document.documentElement.lang = lang;
+    document.body.classList.toggle("no-voice", lang === "et" && !hasRecording);
     document.title = lang === "en" ? TITLE_EN : TITLE;
     for (const id of ["prev", "read", "auto", "next", "lang", "home"]) $(id).setAttribute("aria-label", UI[lang][id]);
     $("lang").textContent = lang === "en" ? "ET" : "EN";
     $("home").href = `../../?lang=${lang}`;
   }
   function setLang(l) {
+    if (l !== lang) setAuto(false);
     lang = l;
     store(LANG_KEY, l);
     applyLang();
@@ -133,7 +150,7 @@
     if (!VIDEO && autoRead) setTimeout(() => page === i && narrate(), 900 + (MOTION?.introSeconds(i) ?? 0) * 1000);
   }
 
-  // ---------- narration: web/audio/pNN.(mp3|wav), else the browser's voice for the language ----------
+  // ---------- narration: Estonian from web/audio/pNN.(mp3|wav), English from the browser's voice ----------
   function stopNarration() {
     clearTimeout(advanceTimer);
     if (audio) { audio.pause(); audio = null; }
@@ -165,16 +182,17 @@
         return;
       }
     }
-    speakFallback(i);
+    if (lang === "en") speakFallback(i);
+    else finished(i);
   }
 
   function speakFallback(i) {
     if (!("speechSynthesis" in window)) return finished(i);
     const u = new SpeechSynthesisUtterance(textOf(PAGES[i]));
-    u.lang = lang === "en" ? "en-GB" : "et-EE";
+    u.lang = "en-GB";
     u.rate = 0.85;
     const voices = speechSynthesis.getVoices();
-    const voice = voices.find((v) => v.lang.replace("_", "-") === u.lang) ?? voices.find((v) => v.lang.toLowerCase().startsWith(lang));
+    const voice = voices.find((v) => v.lang.replace("_", "-") === u.lang) ?? voices.find((v) => v.lang.toLowerCase().startsWith("en"));
     if (voice) u.voice = voice;
     u.onboundary = (e) => {
       textEl.querySelectorAll(".w").forEach((w) => w.classList.toggle("on", +w.dataset.at <= e.charIndex && e.charIndex < +w.dataset.at + w.textContent.length));

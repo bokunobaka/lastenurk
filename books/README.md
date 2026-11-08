@@ -66,7 +66,7 @@ Open `web/index.html` in a browser (double-click works; no server needed).
 - 🔊 reads the page aloud; ▶ reads the whole book, turning pages automatically
 - Tap the picture to get sparkles
 
-The narration uses `web/audio/pNN.*` when present. Otherwise it uses the browser's Estonian voice, if the device has one.
+Estonian narration uses `web/audio/pNN.*` only; the device's Estonian voice is not used (too poor). Without recordings the 🔊/▶ buttons are hidden in Estonian.
 
 To share it, upload the `web/` folder to any static host (Netlify Drop, GitHub Pages, Cloudflare Pages).
 
