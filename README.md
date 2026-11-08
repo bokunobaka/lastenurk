@@ -8,6 +8,7 @@ Estonian picture books and games for ages 4–6, all in one place.
 |---|---|---|---|
 | 📖 | **Printsess Frida päev**: picture book, 24 pages, motion graphics, read-aloud | `books/` | [/books/printsess-frida/](https://bokunobaka.github.io/lastenurk/books/printsess-frida/) |
 | 📖 | **Väikese Rexi päev**: dinosaur picture book, 24 pages | `books/` | [/books/rexi-paev/](https://bokunobaka.github.io/lastenurk/books/rexi-paev/) |
+| 📖 | **Printsess Frida loomaaias**: Frida's family day at the zoo, 21 pages | `books/` | [/books/frida-loomaaias/](https://bokunobaka.github.io/lastenurk/books/frida-loomaaias/) |
 | 🎮 | **Printsessi päev**: 3D game, 16 days (three.js + Vite) | `games/princess-day/` | [/games/princess-day/](https://bokunobaka.github.io/lastenurk/games/princess-day/) |
 | 🎮 | **Dinopäev**: 3D dinosaur game, 16 days (three.js + Vite) | `games/dino-day/` | [/games/dino-day/](https://bokunobaka.github.io/lastenurk/games/dino-day/) |
 

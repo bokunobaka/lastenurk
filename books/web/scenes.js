@@ -37,6 +37,9 @@ const ARMS = {
   brush: [[44, -152], [-6, -214]],
   reach: [[46, -250], [50, -302]],
   low: [[46, -150], [30, -140]],
+  hand: [[50, -160], [80, -124]], // holding hands with someone beside
+  pet: [[58, -150], [96, -96]], // stroking an animal at hip height
+  lowhand: [[50, -150], [70, -98]], // a grown-up holding a small child's hand
 };
 const SHOULDER = [28, -190];
 
@@ -80,6 +83,8 @@ function hairBack(c) {
     case "buns":
       return `<ellipse cx="0" cy="-243" rx="44" ry="42" fill="${h}"/>
         <circle cx="-40" cy="-276" r="17" fill="${h}"/><circle cx="40" cy="-276" r="17" fill="${h}"/>`;
+    case "short":
+      return `<ellipse cx="0" cy="-246" rx="43" ry="40" fill="${h}"/>`;
     case "ponytail":
       return `<ellipse cx="0" cy="-243" rx="44" ry="42" fill="${h}"/>
         <g><animateTransform attributeName="transform" type="rotate" values="-6 34 -258;8 34 -258;-6 34 -258" dur="1.6s" repeatCount="indefinite"/>
@@ -108,6 +113,9 @@ function face(c, o) {
 
 function hairFront(c) {
   let s = `<path d="M-41 -236 C-44 -276 -20 -284 0 -283 C20 -284 44 -276 41 -236 C34 -252 24 -258 12 -254 C6 -262 -6 -262 -12 -256 C-24 -258 -34 -252 -41 -236 Z" fill="${c.hair}"/>`;
+  if (c.beard)
+    s += `<path d="M-39 -232 Q-38 -190 0 -184 Q38 -190 39 -232 Q32 -206 16 -205 Q0 -200 -16 -205 Q-32 -206 -39 -232 Z" fill="${c.hair}"/>
+      <path d="M-14 -222 Q-7 -228 0 -224 Q7 -228 14 -222 Q7 -219 0 -221 Q-7 -219 -14 -222 Z" fill="${c.hair}"/>`;
   if (c.hairStyle === "long")
     s += `<path d="M-41 -242 C-50 -200 -46 -168 -38 -146 L-29 -150 C-34 -180 -35 -214 -31 -242 Z" fill="${c.hair}"/>
       <path d="M41 -242 C50 -200 46 -168 38 -146 L29 -150 C34 -180 35 -214 31 -242 Z" fill="${c.hair}"/>`;
@@ -115,17 +123,18 @@ function hairFront(c) {
 }
 
 function crownSvg(c) {
-  if (c.main) {
+  if (c.jewels) {
     return `<path d="M-25 -270 L-30 -304 L-14 -286 L0 -312 L14 -286 L30 -304 L25 -270 Z" fill="${GOLD}" stroke="${GOLD_EDGE}" stroke-width="2.5" stroke-linejoin="round"/>
       <circle cx="-15" cy="-279" r="4.5" fill="${c.jewels[0]}"/><circle cx="0" cy="-285" r="5.5" fill="${c.jewels[1]}"/><circle cx="15" cy="-279" r="4.5" fill="${c.jewels[2]}"/>
-      ${sparkle(22, -310, 0.5, 0.3)}`;
+      ${c.main ? sparkle(22, -310, 0.5, 0.3) : ""}`;
   }
   return `<path d="M-22 -268 L-18 -290 L-8 -280 L0 -296 L8 -280 L18 -290 L22 -268 Q0 -276 -22 -268 Z" fill="${GOLD}" stroke="${GOLD_EDGE}" stroke-width="2" stroke-linejoin="round"/>
     <circle cx="0" cy="-279" r="4.5" fill="${c.dress[0]}" stroke="#fff" stroke-width="1.5"/>`;
 }
 
 /**
- * Draw a princess with her feet at (x, y).
+ * Draw a princess with her feet at (x, y). Cast members with `outfit: "prince"` get a tunic and trousers
+ * (`shorts: true` for little ones) instead of a dress; `jewels` gives the big three-jewel crown.
  * o: { x, y, s, flip, pj, sit, l, r (arm poses), lAlt/rAlt {pose,dur,begin}, lItem/rItem, eyes, mouth, headOnly, anim, crown }
  */
 function princess(id, o = {}) {
@@ -142,6 +151,11 @@ function princess(id, o = {}) {
   let legs;
   if (sit) {
     legs = `<rect x="-6" y="-56" width="70" height="24" rx="11" fill="${pj ? top : SKIN}"/><ellipse cx="66" cy="-42" rx="10" ry="14" fill="${c.shoe}"/>`;
+  } else if (c.outfit === "prince" && !pj) {
+    const len = c.shorts ? 62 : 104;
+    legs = `${c.shorts ? `<rect x="-20" y="-50" width="13" height="48" fill="${SKIN}"/><rect x="7" y="-50" width="13" height="48" fill="${SKIN}"/>` : ""}
+      <rect x="-24" y="-112" width="22" height="${len}" rx="8" fill="${skirt}"/><rect x="2" y="-112" width="22" height="${len}" rx="8" fill="${skirt}"/>
+      <ellipse cx="-14" cy="-4" rx="14" ry="8" fill="${c.shoe}"/><ellipse cx="14" cy="-4" rx="14" ry="8" fill="${c.shoe}"/>`;
   } else if (pj) {
     legs = `<rect x="-24" y="-112" width="21" height="106" rx="8" fill="${top}"/><rect x="3" y="-112" width="21" height="106" rx="8" fill="${top}"/>
       <ellipse cx="-14" cy="-4" rx="13" ry="7" fill="#ff9fc8"/><ellipse cx="14" cy="-4" rx="13" ry="7" fill="#ff9fc8"/>`;
@@ -151,7 +165,11 @@ function princess(id, o = {}) {
   }
 
   let body;
-  if (pj) {
+  if (c.outfit === "prince" && !pj) {
+    body = `<path d="M-29 -192 Q0 -202 29 -192 L36 -100 Q0 -92 -36 -100 Z" fill="${top}"/>
+      <rect x="-34" y="-134" width="68" height="12" rx="6" fill="${trim}"/><rect x="-7" y="-136" width="14" height="16" rx="3" fill="${GOLD}"/>
+      <path d="M-14 -195 Q0 -180 14 -195" stroke="${trim}" stroke-width="5" fill="none"/>`;
+  } else if (pj) {
     body = `<path d="M-30 -104 L-29 -192 Q0 -202 29 -192 L30 -104 Q0 -98 -30 -104 Z" fill="${top}"/>
       <circle cx="0" cy="-170" r="3" fill="${trim}"/><circle cx="0" cy="-150" r="3" fill="${trim}"/><circle cx="0" cy="-130" r="3" fill="${trim}"/>
       <path d="M-14 -195 Q0 -182 14 -195" stroke="${trim}" stroke-width="5" fill="none"/>`;
@@ -763,9 +781,10 @@ const SCENES = {
 };
 
 globalThis.SCENES = SCENES;
-// Drawing kit for other books (dino-scenes.js)
+// Drawing kit for other books (dino-scenes.js, zoo-scenes.js)
 globalThis.SCENE_KIT = {
   wrap, sky, outdoor, room, sun, cloud, flower, bush, grass, sparkle, bob, hop, windowFrame,
   curtains, teddy, nightSky, dragon, DRAGON_RIDE, HEAD_TOP, NECK_PIVOT,
+  princess, CAST, castle, bed, nightstand, SKIN, GOLD, GOLD_EDGE,
 };
 })();

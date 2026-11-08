@@ -1,6 +1,6 @@
 // Builds shareable single-file books: every script, stylesheet, the font, and any
 // media/ + audio/ files are inlined into one .html that opens anywhere, offline.
-//   node tools/bundle.mjs            -> dist/printsess-frida.html, dist/rexi-paev.html
+//   node tools/bundle.mjs            -> dist/printsess-frida.html, dist/rexi-paev.html, dist/frida-loomaaias.html
 import { readFile, writeFile, readdir, mkdir } from "node:fs/promises";
 import { join, extname } from "node:path";
 
@@ -13,6 +13,7 @@ const MIME = { ".mp4": "video/mp4", ".webm": "video/webm", ".png": "image/png", 
 const BOOKS = [
   { html: "v2.html", out: "printsess-frida.html", assets: "" },
   { html: "dino.html", out: "rexi-paev.html", assets: "dino/" },
+  { html: "zoo.html", out: "frida-loomaaias.html", assets: "zoo/" },
 ];
 
 const dataUrl = (buf, mime) => `data:${mime};base64,${Buffer.from(buf).toString("base64")}`;

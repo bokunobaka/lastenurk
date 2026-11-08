@@ -59,13 +59,15 @@
     "HOPP!": "HOP!", "VIUH!": "WHOOSH!", "AMPS!": "CHOMP!", "AMPS-AMPS!": "CHOMP-CHOMP!", "ÜKS!": "ONE!", "KAKS!": "TWO!", "KOLM!": "THREE!",
     "TERE!": "HELLO!", "TERE HOMMIKUST!": "GOOD MORNING!", "PÕMM!": "BOOM!", "LIRTS!": "SPLISH!", "LÄRTS!": "SPLASH!",
     "LEIDSIN!": "FOUND YOU!", "KRÕMPS!": "CRUNCH!", "KRÕMPS-KRÕMPS!": "CRUNCH-CRUNCH!", "TRAMPSTI!": "STOMP!", "LÜRPS!": "SLURP!",
+    "PRITSTI!": "SPLASH!", "UU-AA!": "OO-AA!", "NOKK-NOKK!": "PECK-PECK!", "MÄÄ!": "BAA!", "KOPP-KOPP!": "CLIP-CLOP!",
+    "SULPSTI!": "SPLOSH!", "NÄMM!": "YUM!",
   };
   const english = () => document.documentElement.lang === "en"; // set by book.js
   const bare = (w) => w.toLowerCase().replace(/[^\p{L}-]/gu, "");
 
   const TRANSITIONS = ["iris", "star", "wipe", "push"];
   const PALETTE = ["#ff5c8a", "#a66cff", "#ffb000", "#2f9bff", "#2fb37a"];
-  const CARD_COLORS = { sun: "#ffb54d", ball: "#ff6f9f", bowl: "#5fc3a0", dragon: "#8e6cff", longneck: "#f0a83c", moon: "#3b3570" };
+  const CARD_COLORS = { sun: "#ffb54d", ball: "#ff6f9f", bowl: "#5fc3a0", dragon: "#8e6cff", longneck: "#f0a83c", paw: "#ff8a65", moon: "#3b3570" };
 
   // Pages may carry their own camera / particles / stickers (other books); else the tables above
   const stickerList = (i) => (PAGES[i].stickers || STICKERS[PAGES[i].scene] || [])
@@ -160,6 +162,9 @@
     bowl: `<svg viewBox="-60 -60 120 120"><path d="M-46 -4 Q0 60 46 -4 Z" fill="#fff"/><path class="steam" d="M-14 -16 q-10 -14 0 -28 q10 -14 0 -28 M14 -16 q-10 -14 0 -28 q10 -14 0 -28" stroke="#fff" stroke-width="7" fill="none" stroke-linecap="round"/></svg>`,
     dragon: `<svg viewBox="-80 -70 160 140"><path d="M-10 -30 L0 -64 L14 -30 Z M24 -30 L44 -60 L46 -24 Z" fill="#ffe14d"/><ellipse cx="10" cy="0" rx="52" ry="40" fill="#fff"/><ellipse cx="-34" cy="12" rx="40" ry="28" fill="#fff"/><circle cx="2" cy="-8" r="9" fill="#3b3570"/><path d="M-66 18 Q-44 32 -22 22" stroke="#3b3570" stroke-width="5" fill="none" stroke-linecap="round"/></svg>`,
     longneck: `<svg viewBox="-80 -80 160 160"><path d="M-60 50 Q-60 0 0 0 Q40 0 40 -40 L40 -60 Q40 -76 56 -76 Q72 -76 72 -60 Q72 -50 60 -48 L60 -30 Q60 20 30 34 Q10 50 -10 50 Z" fill="#fff"/><circle cx="58" cy="-64" r="5" fill="#3b3570"/><ellipse cx="-20" cy="56" rx="50" ry="8" fill="#fff" opacity=".4"/></svg>`,
+    paw: `<svg viewBox="-60 -60 120 120"><g transform="rotate(-12)"><ellipse cx="0" cy="14" rx="30" ry="26" fill="#fff"/>
+      <ellipse cx="-34" cy="-14" rx="11" ry="14" fill="#fff"/><ellipse cx="-13" cy="-34" rx="11" ry="14" fill="#fff"/>
+      <ellipse cx="13" cy="-34" rx="11" ry="14" fill="#fff"/><ellipse cx="34" cy="-14" rx="11" ry="14" fill="#fff"/></g></svg>`,
     moon: `<svg viewBox="-60 -60 120 120"><circle r="40" fill="#fff6c9"/><circle cx="18" cy="-12" r="36" fill="var(--bg)"/><g class="twinkle"><circle cx="34" cy="30" r="4" fill="#fff"/><circle cx="-40" cy="-36" r="3" fill="#fff"/></g></svg>`,
   };
 
