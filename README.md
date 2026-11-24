@@ -16,6 +16,7 @@ Estonian picture books and games for ages 4–6, all in one place.
 | 🎮 | **Printsessi päev**: 3D game, 16 days (three.js + Vite) | `games/princess-day/` | [/games/princess-day/](https://bokunobaka.github.io/lastenurk/games/princess-day/) |
 | 🎮 | **Dinopäev**: 3D dinosaur game, 16 days (three.js + Vite) | `games/dino-day/` | [/games/dino-day/](https://bokunobaka.github.io/lastenurk/games/dino-day/) |
 | 🧩 | **Robot Piiks**: puzzle game, 20 levels: line up arrow cards to drive a robot (Vite) | `games/robot-piiks/` | [/games/robot-piiks/](https://bokunobaka.github.io/lastenurk/games/robot-piiks/) |
+| 🧩 | **Rong Tuut**: puzzle game, 22 levels: turn track pieces so the train reaches the station (Vite) | `games/rong-tuut/` | [/games/rong-tuut/](https://bokunobaka.github.io/lastenurk/games/rong-tuut/) |
 
 ## Layout
 
@@ -24,6 +25,7 @@ Estonian picture books and games for ages 4–6, all in one place.
     games/princess-day/   Printsessi päev (was github.com/bokunobaka/princess-day, history kept)
     games/dino-day/       Dinopäev (was github.com/bokunobaka/dino-day, history kept)
     games/robot-piiks/    Robot Piiks (2D SVG puzzle game, made here)
+    games/rong-tuut/      Rong Tuut (2D SVG track puzzle, made here)
     scripts/build-site.sh builds everything into _site/
     .github/workflows/pages.yml  runs the build and publishes _site/ on every push to main
 

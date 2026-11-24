@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="et">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+    <meta name="theme-color" content="#dff4ff" />
+    <link rel="manifest" href="manifest.webmanifest" />
+    <link rel="apple-touch-icon" href="icons/icon-192.png" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="Rong Tuut" />
+    <title>Rong Tuut</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&display=swap" rel="stylesheet" />
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27%3E%3Ctext y=%27.9em%27 font-size=%2790%27%3E🚂%3C/text%3E%3C/svg%3E" />
+  </head>
+  <body>
+    <div id="title" class="screen">
+      <a id="cornerBtn" class="round" href="../../" data-i18n-aria="aria.corner" aria-label="Tagasi lastenurka" hidden>🏠</a>
+      <div class="langs" role="group" aria-label="Keel / Language">
+        <button type="button" data-lang="et">Eesti</button><button type="button" data-lang="en">English</button>
+      </div>
+      <div class="hero"><svg id="heroTrain" viewBox="-130 -60 260 100"></svg></div>
+      <h1 data-i18n="ui.title">Rong Tuut</h1>
+      <p class="sub" data-i18n="ui.tagline">Keera rööpad õigeks!</p>
+      <button id="playBtn" class="big" data-i18n="ui.play">▶ Mängi</button>
+      <div id="levelGrid" class="levelGrid"></div>
+    </div>
+
+    <div id="play" hidden>
+      <header class="top">
+        <button id="levelsBtn" class="round" data-i18n-aria="aria.levels" aria-label="Tasemed">🏠</button>
+        <div id="badge" class="badge">1</div>
+        <div id="tip" class="tip"></div>
+        <button id="hintBtn" class="round" data-i18n-aria="aria.hint" aria-label="Vihje">💡</button>
+        <button id="muteBtn" class="round" data-i18n-aria="aria.sound" aria-label="Heli">🔊</button>
+      </header>
+      <div id="boardWrap"><svg id="board"></svg></div>
+      <button id="runBtn" class="run" data-i18n-aria="aria.run" aria-label="Sõida"></button>
+    </div>
+
+    <div id="win" class="screen overlay" hidden>
+      <div class="card">
+        <svg id="winTrain" viewBox="-170 -60 340 100"></svg>
+        <h2 id="winTitle"></h2>
+        <div class="btns">
+          <button id="againBtn" class="big alt" data-i18n-aria="aria.again" aria-label="Uuesti">↻</button>
+          <button id="nextBtn" class="big" data-i18n-aria="aria.next" aria-label="Järgmine">▶</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="hand" class="hand" hidden>👆</div>
+    <div id="confetti"></div>
+
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
