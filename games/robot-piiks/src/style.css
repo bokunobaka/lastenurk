@@ -1,0 +1,515 @@
+:root {
+  --ink: #3b2e5a;
+  --soft: #7a6488;
+  --edge: #f1d6b8;
+  --card: clamp(50px, min(12vw, 11vh), 92px);
+  font-family: 'Baloo 2', ui-rounded, 'Nunito', system-ui, sans-serif;
+  font-weight: 700;
+  color: var(--ink);
+}
+* {
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+html,
+body {
+  margin: 0;
+  height: 100%;
+  overflow: hidden;
+  overscroll-behavior: none;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+}
+body {
+  background: radial-gradient(circle at 15% 10%, #fff 0 10%, transparent 11%), radial-gradient(circle at 85% 18%, #fff 0 7%, transparent 8%),
+    linear-gradient(#dff4ff, #fff4e0 70%);
+}
+button {
+  font: inherit;
+  color: inherit;
+  border: 0;
+  background: none;
+  padding: 0;
+  cursor: pointer;
+}
+button:focus-visible,
+a:focus-visible {
+  outline: 4px solid var(--ink);
+  outline-offset: 3px;
+}
+[hidden] {
+  display: none !important;
+}
+
+/* ---------- shared buttons ---------- */
+.round {
+  width: 54px;
+  height: 54px;
+  flex: none;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  font-size: 26px;
+  text-decoration: none;
+  background: rgba(255, 255, 255, 0.92);
+  box-shadow: 0 5px 0 var(--edge), 0 8px 16px rgba(59, 46, 90, 0.12);
+}
+.round:active {
+  transform: translateY(3px);
+  box-shadow: 0 2px 0 var(--edge);
+}
+.big {
+  font-size: clamp(1.6rem, 4vw, 2.2rem);
+  font-weight: 800;
+  padding: 10px 40px 6px;
+  border-radius: 999px;
+  color: #fff;
+  background: #7ccf6a;
+  box-shadow: 0 7px 0 #4f9e45, 0 12px 24px rgba(59, 46, 90, 0.15);
+}
+.big.alt {
+  background: #b99af0;
+  box-shadow: 0 7px 0 #7d5cc4, 0 12px 24px rgba(59, 46, 90, 0.15);
+}
+.big:active {
+  transform: translateY(4px);
+  box-shadow: 0 3px 0 #4f9e45;
+}
+
+/* ---------- title screen ---------- */
+.screen {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  overflow-y: auto;
+  padding: max(16px, env(safe-area-inset-top)) 16px 24px;
+}
+#title {
+  justify-content: flex-start;
+  gap: 6px;
+}
+#cornerBtn {
+  position: absolute;
+  top: max(12px, env(safe-area-inset-top));
+  left: max(12px, env(safe-area-inset-left));
+}
+.langs {
+  position: absolute;
+  top: max(12px, env(safe-area-inset-top));
+  right: max(12px, env(safe-area-inset-right));
+  display: flex;
+  gap: 4px;
+  padding: 4px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.85);
+  box-shadow: 0 3px 0 var(--edge);
+}
+.langs button {
+  font-weight: 800;
+  padding: 6px 12px 3px;
+  min-height: 40px;
+  border-radius: 999px;
+}
+.langs button[aria-pressed='true'] {
+  background: #c9f2ea;
+}
+.hero {
+  margin-top: clamp(40px, 6vh, 70px);
+  width: clamp(120px, 26vh, 200px);
+  animation: hover 2.4s ease-in-out infinite;
+}
+.hero svg {
+  width: 100%;
+  display: block;
+}
+h1 {
+  margin: 0;
+  font-size: clamp(2.6rem, 8vw, 4rem);
+  line-height: 1;
+  font-weight: 800;
+}
+.sub {
+  margin: 0 0 12px;
+  font-size: clamp(1.1rem, 2.6vw, 1.4rem);
+  color: var(--soft);
+}
+.levelGrid {
+  margin-top: 22px;
+  display: grid;
+  grid-template-columns: repeat(5, clamp(54px, 15vw, 78px));
+  gap: 12px;
+}
+.lvl {
+  aspect-ratio: 1;
+  border-radius: 20px;
+  background: #fff;
+  box-shadow: 0 5px 0 var(--edge);
+  font-size: clamp(1.3rem, 3.6vw, 1.8rem);
+  font-weight: 800;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+.lvl small {
+  font-size: 0.6em;
+  letter-spacing: -1px;
+  margin-top: 4px;
+  min-height: 1em;
+  color: #f2a93b;
+}
+.lvl.done {
+  background: #e4fbf6;
+  box-shadow: 0 5px 0 #8fe3d8;
+}
+.lvl.next {
+  background: #fff3c9;
+  box-shadow: 0 5px 0 #ffd36b;
+  animation: pulse 1.6s ease-in-out infinite;
+}
+.lvl:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+.lvl:not(:disabled):active {
+  transform: translateY(3px);
+}
+
+/* ---------- play screen ---------- */
+#play {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  padding: max(10px, env(safe-area-inset-top)) max(10px, env(safe-area-inset-right)) max(10px, env(safe-area-inset-bottom))
+    max(10px, env(safe-area-inset-left));
+  gap: 8px;
+}
+.top {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.badge {
+  flex: none;
+  min-width: 54px;
+  height: 54px;
+  padding: 4px 12px 0;
+  border-radius: 999px;
+  display: grid;
+  place-items: center;
+  font-size: 1.7rem;
+  font-weight: 800;
+  color: #fff;
+  background: #6fd3c4;
+  box-shadow: 0 5px 0 #3fa597;
+}
+.tip {
+  flex: 1;
+  min-width: 0;
+  font-size: clamp(1rem, 2.4vw, 1.35rem);
+  line-height: 1.15;
+  color: var(--soft);
+}
+#hintBtn.glow {
+  animation: pulse 1.2s ease-in-out infinite;
+  background: #fff3c9;
+}
+#boardWrap {
+  flex: 1;
+  min-height: 0;
+  position: relative;
+}
+#board {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+.dock {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: center;
+}
+.progRow,
+.palRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  max-width: 100%;
+}
+.tray {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px;
+  border-radius: 24px;
+  background: rgba(255, 255, 255, 0.92);
+  box-shadow: 0 5px 0 var(--edge);
+  min-height: calc(var(--card) * 1.1 + 20px);
+}
+.slot {
+  width: var(--card);
+  height: calc(var(--card) * 1.1);
+  border: 4px dashed #e0c9a6;
+  border-radius: 18px;
+}
+.slot.first {
+  border-color: #c9a77e;
+}
+.pcard,
+.acard {
+  position: relative;
+  width: var(--card);
+  height: calc(var(--card) * 1.1);
+  transition: transform 0.15s;
+}
+.pcard svg,
+.acard svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+.acard {
+  --card: clamp(60px, min(15vw, 13vh), 110px);
+}
+.acard:active {
+  transform: translateY(4px) scale(0.96);
+}
+.pcard.now {
+  transform: translateY(-8px) scale(1.08);
+  filter: drop-shadow(0 0 8px #ffd36b) drop-shadow(0 0 4px #ffd36b);
+}
+.pcard.pop {
+  animation: pop 0.25s ease-out;
+}
+.times {
+  position: absolute;
+  right: -8px;
+  top: -10px;
+  min-width: 36px;
+  height: 36px;
+  padding: 3px 6px 0;
+  border-radius: 999px;
+  display: grid;
+  place-items: center;
+  font-size: 1.3rem;
+  font-weight: 800;
+  color: #fff;
+  background: #7d5cc4;
+  box-shadow: 0 3px 0 #5a3f99;
+}
+.times.one {
+  opacity: 0.55;
+  transform: scale(0.8);
+}
+#palette {
+  display: flex;
+  gap: 12px;
+}
+.run {
+  width: clamp(66px, min(16vw, 14vh), 112px);
+  height: clamp(66px, min(16vw, 14vh), 112px);
+}
+.run svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+.run:active {
+  transform: translateY(4px);
+}
+.run.ready {
+  animation: pulse 1.4s ease-in-out infinite;
+}
+.undo:disabled,
+#hintBtn:disabled {
+  opacity: 0.4;
+}
+.shake {
+  animation: shake 0.5s ease-in-out 2;
+}
+.locked .acard,
+.locked .pcard,
+.locked .undo {
+  pointer-events: none;
+}
+
+/* ---------- win ---------- */
+.overlay {
+  justify-content: center;
+  background: rgba(223, 244, 255, 0.6);
+  backdrop-filter: blur(3px);
+}
+.overlay .card {
+  background: #fff;
+  border-radius: 32px;
+  padding: 18px 28px 28px;
+  text-align: center;
+  box-shadow: 0 8px 0 #8fe3d8, 0 20px 40px rgba(59, 46, 90, 0.18);
+  animation: rise 0.4s cubic-bezier(0.3, 1.5, 0.5, 1);
+  max-width: 92vw;
+}
+#winBot {
+  width: 140px;
+  display: block;
+  margin: 0 auto;
+  animation: hop 0.6s ease-in-out infinite alternate;
+}
+.overlay h2 {
+  margin: 4px 0;
+  font-size: clamp(1.7rem, 5vw, 2.4rem);
+  line-height: 1.1;
+}
+.winStars {
+  font-size: 2.6rem;
+  min-height: 0.5em;
+  letter-spacing: 6px;
+}
+.winStars .off {
+  filter: grayscale(1);
+  opacity: 0.35;
+}
+.winStars span {
+  display: inline-block;
+  animation: pop 0.4s ease-out backwards;
+}
+.btns {
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+  margin-top: 14px;
+}
+
+/* ---------- helpers ---------- */
+.tip.say {
+  transform-origin: left center;
+  color: var(--ink);
+  font-weight: 800;
+  animation: pop 0.3s ease-out;
+}
+.hand {
+  position: fixed;
+  z-index: 20;
+  font-size: 54px;
+  pointer-events: none;
+  filter: drop-shadow(0 4px 4px rgba(0, 0, 0, 0.2));
+  animation: tap 1s ease-in-out infinite;
+  transition: left 0.3s, top 0.3s;
+}
+#confetti {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 30;
+}
+#confetti i {
+  position: absolute;
+  top: -20px;
+  width: 12px;
+  height: 18px;
+  border-radius: 3px;
+  animation: fall linear forwards;
+}
+
+@keyframes hover {
+  50% {
+    transform: translateY(-10px);
+  }
+}
+@keyframes pulse {
+  50% {
+    transform: scale(1.07);
+  }
+}
+@keyframes pop {
+  0% {
+    transform: scale(0.4);
+  }
+  70% {
+    transform: scale(1.15);
+  }
+}
+@keyframes shake {
+  25% {
+    transform: translateX(-7px) rotate(-4deg);
+  }
+  75% {
+    transform: translateX(7px) rotate(4deg);
+  }
+}
+@keyframes rise {
+  from {
+    transform: translateY(40px) scale(0.9);
+    opacity: 0;
+  }
+}
+@keyframes hop {
+  to {
+    transform: translateY(-12px);
+  }
+}
+@keyframes tap {
+  50% {
+    transform: translate(4px, 10px) scale(0.92);
+  }
+}
+@keyframes fall {
+  to {
+    transform: translateY(110vh) rotate(720deg);
+  }
+}
+/* short landscape screens (phones turned sideways): the cards go to the right of the board */
+@media (orientation: landscape) and (max-height: 560px) {
+  #play {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    grid-template-rows: auto 1fr;
+  }
+  .top {
+    grid-column: 1 / -1;
+  }
+  .top .round,
+  .badge {
+    width: 46px;
+    min-width: 46px;
+    height: 46px;
+    font-size: 22px;
+  }
+  .dock {
+    justify-content: center;
+    max-width: 52vw;
+  }
+  .progRow,
+  .palRow {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  :root {
+    --card: clamp(40px, 13vh, 64px);
+  }
+  .acard {
+    --card: clamp(46px, 16vh, 76px);
+  }
+  .run {
+    width: clamp(54px, 18vh, 84px);
+    height: clamp(54px, 18vh, 84px);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hero,
+  .lvl.next,
+  .run.ready,
+  #hintBtn.glow,
+  #winBot {
+    animation: none;
+  }
+}

@@ -1,0 +1,33 @@
+// Checks every level: it has a start and a battery, every star can be collected,
+// and the card slots are enough. Prints the shortest plan for each.
+// Usage: npm run check
+import { levels, simulate, plan } from '../src/levels.js';
+
+let bad = 0;
+for (const lv of levels) {
+  const n = lv.index + 1;
+  const problems = [];
+  if (!lv.start || !lv.goal) problems.push('no start or battery');
+  const p = plan(lv);
+  if (!p) problems.push('cannot reach the battery');
+  else {
+    const program = [];
+    for (const d of p.moves) {
+      const last = program[program.length - 1];
+      if (last && last.dir === d && last.n < lv.maxRep) last.n++;
+      else program.push({ dir: d, n: 1 });
+    }
+    const sim = simulate(lv, program);
+    if (sim.result !== 'win') problems.push(`plan does not win (${sim.result})`);
+    if (sim.mask !== lv.full) problems.push('plan misses stars');
+    if (program.length > lv.slots) problems.push('not enough slots');
+    if (p.moves.some((d) => !lv.cards.includes(d))) problems.push('plan needs a card the level does not offer');
+    const text = program.map((c) => `${c.dir}${c.n > 1 ? '×' + c.n : ''}`).join(' ');
+    console.log(`${String(n).padStart(2)}  ${lv.W}x${lv.H}  stars ${lv.stars.length}  slots ${lv.slots}  ${text}`);
+  }
+  if (problems.length) {
+    bad++;
+    console.log(`    !! level ${n}: ${problems.join(', ')}`);
+  }
+}
+process.exit(bad ? 1 : 0);
