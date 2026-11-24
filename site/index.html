@@ -42,12 +42,38 @@
     h1 span { display: inline-block; animation: bob 2.6s ease-in-out infinite; }
     h1 span:nth-child(2n) { animation-delay: -1.3s; }
     header p { margin: .4em 0 0; font-size: clamp(1.05rem, 2.2vw, 1.3rem); color: var(--soft); }
-    h2 {
-      font-weight: 800;
-      font-size: clamp(1.6rem, 3.6vw, 2.2rem);
-      margin: clamp(24px, 4vw, 40px) 0 14px;
-      display: flex; align-items: center; gap: .4em;
+    /* books / games tabs: big, so a child can switch them too; they stay in reach while scrolling */
+    .tabs {
+      position: sticky; top: 10px; z-index: 5;
+      display: flex; justify-content: center; gap: clamp(8px, 2vw, 16px);
+      width: max-content; max-width: 100%;
+      margin: 0 auto clamp(18px, 3vw, 30px);
+      padding: 7px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, .85);
+      backdrop-filter: blur(6px);
+      box-shadow: 0 4px 0 #f1d6b8, 0 10px 24px rgba(74, 44, 94, .1);
     }
+    .tabs button {
+      font: inherit; font-weight: 800; color: var(--ink);
+      font-size: clamp(1.2rem, 3.4vw, 1.6rem);
+      display: flex; align-items: center; gap: .35em;
+      border: 0; border-radius: 999px; cursor: pointer;
+      padding: 8px clamp(16px, 3.4vw, 30px) 5px; min-height: 56px;
+      background: transparent;
+      transition: background .15s, transform .15s;
+    }
+    .tabs button:hover { background: #fff4e0; }
+    .tabs button[aria-selected="true"] { background: var(--tab); box-shadow: inset 0 -4px 0 var(--tab-edge); }
+    .tabs button:focus-visible { outline: 3px solid var(--ink); outline-offset: 2px; }
+    .tabs button:active { transform: translateY(2px); }
+    #tab-books { --tab: #ffd6ea; --tab-edge: #ffb3d4; }
+    #tab-games { --tab: #c8f0b0; --tab-edge: #a7dd8f; }
+    .tabs .count {
+      font-size: .7em; min-width: 1.7em; padding: 2px 8px 0; border-radius: 999px;
+      background: rgba(255, 255, 255, .85); color: var(--soft);
+    }
+    [role="tabpanel"][hidden] { display: none; }
     .grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(min(100%, 340px), 1fr));
@@ -99,6 +125,7 @@
     .langs button[aria-pressed="true"] { background: #ffd6ea; }
     .langs button:focus-visible { outline: 3px solid var(--ink); outline-offset: 2px; }
     @media (max-width: 640px) { main { padding-top: 72px; } }
+    @media (prefers-reduced-motion: reduce) { .tabs button { transition: none; } }
     footer { margin-top: 48px; text-align: center; color: var(--soft); font-size: 1rem; }
     footer a { color: inherit; }
     @keyframes bob { 50% { transform: translateY(-6px); } }
@@ -121,8 +148,16 @@
 
     <!-- To add a book or game: add a card here and a 16:9 picture in thumbs/.
          Games live in games/<name>/ and books in books/ (see the README). -->
-    <section aria-labelledby="h-books">
-      <h2 id="h-books" data-en="📖 Books">📖 Raamatud</h2>
+    <div class="tabs" role="tablist" aria-label="Raamatud ja mängud / Books and games">
+      <button type="button" role="tab" id="tab-books" aria-controls="panel-books" data-tab="books">
+        <span aria-hidden="true">📖</span><span data-en="Books">Raamatud</span><span class="count"></span>
+      </button>
+      <button type="button" role="tab" id="tab-games" aria-controls="panel-games" data-tab="games">
+        <span aria-hidden="true">🎮</span><span data-en="Games">Mängud</span><span class="count"></span>
+      </button>
+    </div>
+
+    <section id="panel-books" role="tabpanel" aria-labelledby="tab-books">
       <div class="grid">
         <a class="card pink" href="books/printsess-frida/">
           <div class="thumb"><img src="thumbs/printsess-frida.webp" alt="" loading="lazy" /><span class="tag" data-en="📖 Book">📖 Raamat</span></div>
@@ -183,8 +218,7 @@
       </div>
     </section>
 
-    <section aria-labelledby="h-games">
-      <h2 id="h-games" data-en="🎮 Games">🎮 Mängud</h2>
+    <section id="panel-games" role="tabpanel" aria-labelledby="tab-games" hidden>
       <div class="grid">
         <a class="card pink" href="games/princess-day/">
           <div class="thumb"><img src="thumbs/princess-day.webp" alt="" loading="lazy" /><span class="tag" data-en="🎮 Game">🎮 Mäng</span></div>
@@ -246,7 +280,38 @@
       }
       for (const b of document.querySelectorAll(".langs button")) b.onclick = () => set(b.dataset.lang);
       set(q === "en" || q === "et" ? q : store() === "en" ? "en" : "et");
-      if (q) history.replaceState(null, "", location.pathname);
+      if (q) history.replaceState(null, "", location.pathname + location.hash);
+    })();
+
+    // Books / games tabs. The open tab is remembered (and kept in the address as #books / #games),
+    // so coming back from a game with its 🏠 button lands on the games again.
+    (() => {
+      const KEY = "lastenurk.tab";
+      const tabs = [...document.querySelectorAll('[role="tab"]')];
+      for (const t of tabs) t.querySelector(".count").textContent = document.getElementById(`panel-${t.dataset.tab}`).querySelectorAll("a.card").length;
+      function show(name, focus) {
+        for (const t of tabs) {
+          const on = t.dataset.tab === name;
+          t.setAttribute("aria-selected", on);
+          t.tabIndex = on ? 0 : -1;
+          document.getElementById(`panel-${t.dataset.tab}`).hidden = !on;
+          if (on && focus) t.focus();
+        }
+        try { localStorage.setItem(KEY, name); } catch {}
+        history.replaceState(null, "", `${location.pathname}${location.search}#${name}`);
+      }
+      tabs.forEach((t, i) => {
+        t.onclick = () => show(t.dataset.tab);
+        t.onkeydown = (e) => {
+          const step = { ArrowRight: 1, ArrowLeft: -1 }[e.key];
+          if (step) show(tabs[(i + step + tabs.length) % tabs.length].dataset.tab, true);
+        };
+      });
+      const names = tabs.map((t) => t.dataset.tab);
+      const fromHash = location.hash.slice(1);
+      let saved = null;
+      try { saved = localStorage.getItem(KEY); } catch {}
+      show(names.includes(fromHash) ? fromHash : names.includes(saved) ? saved : "books");
     })();
   </script>
 </body>
