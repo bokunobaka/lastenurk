@@ -131,6 +131,12 @@ function renderBoard() {
   for (let y = 0; y < lv.H; y++)
     for (let x = 0; x < lv.W; x++) s += `<g transform="translate(${x * 100} ${y * 100})">${A.grass((x + y) % 2 === 1, x * 7 + y * 3 + lv.index)}</g>`;
   s += `</g><g transform="translate(${lv.start.x * 100} ${lv.start.y * 100})">${A.startPad()}</g>`;
+  for (const [k, dir] of lv.belts) s += `<g transform="translate(${k.split(',')[0] * 100} ${k.split(',')[1] * 100})">${A.belt(dir)}</g>`;
+  lv.map.forEach((row, y) =>
+    [...row].forEach((ch, x) => {
+      if (ch === '1' || ch === '2') s += `<g transform="translate(${x * 100} ${y * 100})">${A.pad(ch)}</g>`;
+    })
+  );
   const thing = { R: A.rock, T: A.tree, '~': A.pond, '#': A.crate, B: A.battery };
   lv.map.forEach((row, y) =>
     [...row].forEach((ch, x) => {
@@ -140,14 +146,19 @@ function renderBoard() {
   lv.stars.forEach((st, i) => {
     s += `<g transform="translate(${st.x * 100} ${st.y * 100})"><g class="star" id="star${i}" style="transform-box:fill-box;transform-origin:center">${A.star()}</g></g>`;
   });
+  lv.gates.forEach((g, i) => {
+    s += `<g transform="translate(${g.x * 100} ${g.y * 100})"><g id="gate${i}" style="transform-box:fill-box;transform-origin:50% 100%">${A.gate()}</g></g>`;
+  });
+  if (lv.key) s += `<g transform="translate(${lv.key.x * 100} ${lv.key.y * 100})"><g id="keyG" style="transform-box:fill-box;transform-origin:center">${A.key()}</g></g>`;
   s += `<g id="bot"><g id="botInner"></g></g><g id="fx"></g>`;
   board.innerHTML = s;
   placeBot(lv.start.x, lv.start.y);
   face();
 }
 
-function placeBot(x, y, hop = 0, tilt = 0) {
-  $('bot').setAttribute('transform', `translate(${x * 100} ${y * 100 - 6 - hop}) rotate(${tilt} 50 90)`);
+function placeBot(x, y, hop = 0, tilt = 0, size = 1) {
+  const grow = size === 1 ? '' : ` translate(50 60) scale(${size}) rotate(${(1 - size) * 360} 0 0) translate(-50 -60)`;
+  $('bot').setAttribute('transform', `translate(${x * 100} ${y * 100 - 6 - hop}) rotate(${tilt} 50 90)${grow}`);
 }
 function face(o = {}) {
   $('botInner').innerHTML = A.robot(o);
@@ -259,11 +270,23 @@ async function run() {
   for (const s of sim.steps) {
     if (id !== runId) return;
     mark(s.card);
-    face({ look: STEP[s.dir] });
-    sfx.step(s.dir);
-    await moveBot(at, s);
+    if (s.via === 'pad') {
+      sfx.pad();
+      await tween(220, (k) => placeBot(at.x, at.y, 0, 0, 1 - k * 0.95));
+      sparkle(at.x * 100 + 50, at.y * 100 + 55, '#b99af0');
+      await tween(260, (k) => placeBot(s.x, s.y, 0, 0, 0.05 + k * 0.95));
+      sparkle(s.x * 100 + 50, s.y * 100 + 55, '#b99af0');
+    } else if (s.via === 'belt') {
+      sfx.belt();
+      await moveBot(at, s, 260, false);
+    } else {
+      face({ look: STEP[s.dir] });
+      sfx.step(s.dir);
+      await moveBot(at, s);
+    }
     at = s;
     if (s.star >= 0) collectStar(s.star);
+    if (s.key) collectKey();
   }
   if (id !== runId) return;
   if (sim.result === 'win') return win(sim, id);
@@ -293,11 +316,30 @@ function stopRun() {
   if (lv) changed();
 }
 
-async function moveBot(from, to, ms = 380) {
+async function moveBot(from, to, ms = 380, hop = true) {
   const dx = to.x - from.x;
   await tween(ms, (k) => {
-    const e = ease(k);
-    placeBot(from.x + (to.x - from.x) * e, from.y + (to.y - from.y) * e, Math.sin(k * Math.PI) * 7, dx * 7 * Math.sin(k * Math.PI));
+    const e = hop ? ease(k) : k;
+    const lift = hop ? Math.sin(k * Math.PI) * 7 : 0;
+    placeBot(from.x + (to.x - from.x) * e, from.y + (to.y - from.y) * e, lift, hop ? dx * 7 * Math.sin(k * Math.PI) : 0);
+  });
+}
+
+// the key flies up and the gates swing down out of the way
+function collectKey() {
+  sfx.key();
+  const kg = $('keyG');
+  tween(450, (k) => {
+    kg.style.transform = `translateY(${-40 * k}px) scale(${1 + k * 0.5})`;
+    kg.style.opacity = 1 - k;
+  });
+  sparkle(lv.key.x * 100 + 50, lv.key.y * 100 + 50, '#ffd36b');
+  lv.gates.forEach((_, i) => {
+    const g = $(`gate${i}`);
+    tween(500, (k) => {
+      g.style.transform = `scaleY(${1 - k * 0.92})`;
+      g.style.opacity = 1 - k * 0.7;
+    });
   });
 }
 
@@ -320,6 +362,11 @@ async function resetBot() {
     s.style.transform = '';
     s.style.opacity = '';
   });
+  for (const el of [$('keyG'), ...lv.gates.map((_, i) => $(`gate${i}`))]) {
+    if (!el) continue;
+    el.style.transform = '';
+    el.style.opacity = '';
+  }
   await tween(180, (k) => bot.setAttribute('opacity', k));
 }
 

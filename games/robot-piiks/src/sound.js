@@ -54,6 +54,16 @@ export const sfx = {
     tone(1760, 0.2, { vol: 0.1, at: 0.08 });
   },
   bump: () => tone(180, 0.3, { type: 'square', vol: 0.08, to: 70 }),
+  belt: () => tone(140, 0.22, { type: 'sawtooth', vol: 0.035, to: 190 }),
+  pad: () => {
+    tone(400, 0.25, { type: 'sine', vol: 0.1, to: 1600 });
+    tone(800, 0.3, { type: 'triangle', vol: 0.06, at: 0.2, to: 1200 });
+  },
+  key: () => {
+    [1047, 1319, 1568].forEach((f, i) => tone(f, 0.14, { vol: 0.1, at: i * 0.07 }));
+    tone(330, 0.12, { type: 'square', vol: 0.05, at: 0.25 });
+    tone(440, 0.16, { type: 'square', vol: 0.05, at: 0.33 });
+  },
   short: () => {
     tone(440, 0.14, { type: 'triangle' });
     tone(370, 0.22, { type: 'triangle', at: 0.15 });

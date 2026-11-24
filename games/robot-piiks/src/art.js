@@ -126,6 +126,61 @@ export function crate() {
     <rect x="22" y="36" width="56" height="48" rx="3" fill="none" stroke="#c4823f" stroke-width="5"/>`;
 }
 
+// ---------- belts, teleport pads, key and gate ----------
+const BELT_ROT = { right: 0, down: 90, left: 180, up: 270 };
+
+// a conveyor belt running in direction dir; the chevrons keep sliding that way
+export function belt(dir) {
+  let chev = '';
+  for (let i = 0; i < 3; i++) {
+    chev += `<path d="M${18 + i * 30} 36 L${30 + i * 30} 50 L${18 + i * 30} 64" stroke="#ffd36b" stroke-width="7" fill="none" stroke-linecap="round" stroke-linejoin="round">
+      <animateTransform attributeName="transform" type="translate" values="0 0;30 0" dur=".9s" repeatCount="indefinite"/>
+      ${i === 2 ? '<animate attributeName="opacity" values="1;0" dur=".9s" repeatCount="indefinite"/>' : ''}
+      ${i === 0 ? '<animate attributeName="opacity" values="0;1" dur=".9s" repeatCount="indefinite"/>' : ''}</path>`;
+  }
+  return `<g transform="rotate(${BELT_ROT[dir]} 50 50)">
+    <rect x="2" y="24" width="96" height="56" rx="14" fill="#000" opacity=".12"/>
+    <rect x="2" y="20" width="96" height="56" rx="14" fill="#5b6b8c"/>
+    <rect x="8" y="27" width="84" height="42" rx="9" fill="#77879f"/>
+    ${chev}
+    <circle cx="8" cy="48" r="5" fill="#8fa0c2"/><circle cx="92" cy="48" r="5" fill="#8fa0c2"/></g>`;
+}
+
+const PAD_COLORS = { 1: ['#7cc4f0', '#3f8fc4', '#d8efff'], 2: ['#ff9fc8', '#d9608f', '#ffe0ee'] };
+// a teleport pad; pads with the same number (and colour) are a pair
+export function pad(n) {
+  const [c, d, light] = PAD_COLORS[n] || PAD_COLORS[1];
+  return `<ellipse cx="50" cy="62" rx="38" ry="22" fill="${d}"/>
+    <ellipse cx="50" cy="58" rx="38" ry="22" fill="${c}"/>
+    <ellipse cx="50" cy="58" rx="26" ry="14" fill="${light}"/>
+    <g><ellipse cx="50" cy="58" rx="32" ry="18" fill="none" stroke="#fff" stroke-width="3" stroke-dasharray="10 9" opacity=".9"/>
+      <animateTransform attributeName="transform" type="rotate" values="0 50 58;360 50 58" dur="4s" repeatCount="indefinite"/></g>
+    <g opacity=".85"><path d="M38 52 v-16 M50 48 v-22 M62 52 v-16" stroke="${light}" stroke-width="4" stroke-linecap="round"/>
+      <animateTransform attributeName="transform" type="translate" values="0 6;0 -6;0 6" dur="1.6s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values=".2;.9;.2" dur="1.6s" repeatCount="indefinite"/></g>`;
+}
+
+export function key() {
+  return `<g><ellipse cx="50" cy="86" rx="20" ry="4" fill="#000" opacity=".12"/>
+    <circle cx="36" cy="46" r="17" fill="#ffd36b"/><circle cx="36" cy="46" r="7" fill="#fff4e0"/>
+    <rect x="48" y="40" width="34" height="12" rx="5" fill="#ffd36b"/>
+    <rect x="66" y="50" width="7" height="12" rx="2" fill="#ffd36b"/><rect x="76" y="50" width="6" height="9" rx="2" fill="#ffd36b"/>
+    <circle cx="30" cy="38" r="4" fill="#fff" opacity=".7"/>
+    <animateTransform attributeName="transform" type="translate" values="0 0;0 -5;0 0" dur="1.8s" repeatCount="indefinite"/></g>`;
+}
+
+// a little wooden gate with a padlock; it opens when the key is picked up
+export function gate() {
+  let planks = '';
+  for (let x = 16; x < 84; x += 17) planks += `<rect x="${x}" y="24" width="13" height="62" rx="5" fill="#e0a05c"/>`;
+  return `<ellipse cx="50" cy="90" rx="38" ry="5" fill="#000" opacity=".12"/>
+    <rect x="8" y="16" width="10" height="74" rx="4" fill="#b07a4f"/><rect x="82" y="16" width="10" height="74" rx="4" fill="#b07a4f"/>
+    ${planks}<rect x="12" y="38" width="76" height="9" rx="4" fill="#c4823f"/><rect x="12" y="66" width="76" height="9" rx="4" fill="#c4823f"/>
+    <path d="M42 50 v-7 a8 8 0 0 1 16 0 v7" stroke="#8f8aa3" stroke-width="4" fill="none"/>
+    <rect x="38" y="49" width="24" height="20" rx="5" fill="#ffd36b"/>
+    <circle cx="50" cy="57" r="3" fill="#7a5a1f"/><rect x="48.5" y="58" width="3" height="6" rx="1" fill="#7a5a1f"/>`;
+}
+
 // ---------- program cards (100x110) ----------
 export const DIRS = {
   up: { color: '#7cc4f0', edge: '#3f8fc4', rot: 0 },

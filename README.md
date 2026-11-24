@@ -15,7 +15,7 @@ Estonian picture books and games for ages 4–6, all in one place.
 | 📖 | **Printsess Frida arsti juures**: a gentle check-up at the doctor's, 15 pages | `books/` | [/books/frida-arsti-juures/](https://bokunobaka.github.io/lastenurk/books/frida-arsti-juures/) |
 | 🎮 | **Printsessi päev**: 3D game, 16 days (three.js + Vite) | `games/princess-day/` | [/games/princess-day/](https://bokunobaka.github.io/lastenurk/games/princess-day/) |
 | 🎮 | **Dinopäev**: 3D dinosaur game, 16 days (three.js + Vite) | `games/dino-day/` | [/games/dino-day/](https://bokunobaka.github.io/lastenurk/games/dino-day/) |
-| 🧩 | **Robot Piiks**: puzzle game, 20 levels: line up arrow cards to drive a robot (Vite) | `games/robot-piiks/` | [/games/robot-piiks/](https://bokunobaka.github.io/lastenurk/games/robot-piiks/) |
+| 🧩 | **Robot Piiks**: puzzle game, 30 levels: line up arrow cards to drive a robot (Vite) | `games/robot-piiks/` | [/games/robot-piiks/](https://bokunobaka.github.io/lastenurk/games/robot-piiks/) |
 | 🧩 | **Rong Tuut**: puzzle game, 22 levels: turn track pieces so the train reaches the station (Vite) | `games/rong-tuut/` | [/games/rong-tuut/](https://bokunobaka.github.io/lastenurk/games/rong-tuut/) |
 
 ## Layout
