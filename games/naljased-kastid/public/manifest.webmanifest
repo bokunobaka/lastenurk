@@ -1,0 +1,17 @@
+{
+  "name": "Näljased kastid",
+  "short_name": "Näljased kastid",
+  "description": "Näljased kastid: sorteerimismäng. Iga kast sööb ainult oma asju: värvi, kuju, suuruse või liigi järgi. Mõtlemismäng 4–6-aastastele.",
+  "lang": "et",
+  "start_url": "./",
+  "scope": "./",
+  "display": "fullscreen",
+  "orientation": "any",
+  "background_color": "#fff4e0",
+  "theme_color": "#fff4e0",
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
