@@ -18,6 +18,7 @@ Estonian picture books and games for ages 4–6, all in one place.
 | 🧩 | **Robot Piiks**: puzzle game, 30 levels: line up arrow cards to drive a robot (Vite) | `games/robot-piiks/` | [/games/robot-piiks/](https://bokunobaka.github.io/lastenurk/games/robot-piiks/) |
 | 🧩 | **Rong Tuut**: puzzle game, 22 levels: turn track pieces so the train reaches the station (Vite) | `games/rong-tuut/` | [/games/rong-tuut/](https://bokunobaka.github.io/lastenurk/games/rong-tuut/) |
 | 🧩 | **Kujundipusle**: shape puzzle, 19 pictures: drag shapes onto a shadow, turn them, and the picture comes alive (Vite) | `games/kujundipusle/` | [/games/kujundipusle/](https://bokunobaka.github.io/lastenurk/games/kujundipusle/) |
+| ➕ | **Konn Krooks**: adding and taking away, 25 levels: number cards make a frog hop along lily pads 0–20 to catch a fly (Vite) | `games/konn-krooks/` | [/games/konn-krooks/](https://bokunobaka.github.io/lastenurk/games/konn-krooks/) |
 
 ## Layout
 
@@ -28,6 +29,7 @@ Estonian picture books and games for ages 4–6, all in one place.
     games/robot-piiks/    Robot Piiks (2D SVG puzzle game, made here)
     games/rong-tuut/      Rong Tuut (2D SVG track puzzle, made here)
     games/kujundipusle/   Kujundipusle (2D SVG shape puzzle, made here)
+    games/konn-krooks/    Konn Krooks (2D SVG adding and taking-away game, made here)
     scripts/build-site.sh builds everything into _site/
     .github/workflows/pages.yml  runs the build and publishes _site/ on every push to main
 
