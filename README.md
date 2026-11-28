@@ -22,6 +22,7 @@ Estonian picture books and games for ages 4–6, all in one place.
 | 🧩 | **Näljased kastid**: sorting game, 22 levels: drag things off a conveyor belt into hungry boxes by colour, kind, size, shape, spots; rubbish into bins (Vite) | `games/naljased-kastid/` | [/games/naljased-kastid/](https://bokunobaka.github.io/lastenurk/games/naljased-kastid/) |
 | 🐛 | **Mustriröövik**: pattern game, 25 levels: fill the gaps in a caterpillar's patterned body (colours, pictures, sizes, dots, arrows, growing patterns, a wrong segment) (Vite) | `games/mustriroovik/` | [/games/mustriroovik/](https://bokunobaka.github.io/lastenurk/games/mustriroovik/) |
 | 🚗 | **Põrr-auto**: driving game, 12 drives and an endless road: tilt the tablet (or drag a finger) to steer, collect stars, dodge cones, jump ramps, honk at slow cars (Vite) | `games/porr-auto/` | [/games/porr-auto/](https://bokunobaka.github.io/lastenurk/games/porr-auto/) |
+| 🐞 | **Lepatriinu labürint**: tilt maze, 20 levels: tilt the tablet (or drag a finger) to roll a ladybug through a garden, pick up her lost spots and take her home; holes, mushrooms, ice, honey, flower buttons and gates (Vite) | `games/lepatriinu/` | [/games/lepatriinu/](https://bokunobaka.github.io/lastenurk/games/lepatriinu/) |
 
 ## Layout
 
@@ -36,6 +37,7 @@ Estonian picture books and games for ages 4–6, all in one place.
     games/naljased-kastid/ Näljased kastid (2D SVG sorting game, made here)
     games/mustriroovik/   Mustriröövik (2D SVG pattern game, made here)
     games/porr-auto/      Põrr-auto (2D canvas driving game steered by tilting, made here)
+    games/lepatriinu/     Lepatriinu labürint (2D canvas tilt maze, made here)
     scripts/build-site.sh builds everything into _site/
     .github/workflows/pages.yml  runs the build and publishes _site/ on every push to main
 

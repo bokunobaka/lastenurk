@@ -52,14 +52,15 @@ function listen() {
 export async function request() {
   const DOE = window.DeviceOrientationEvent;
   if (!DOE) return false;
+  // listen whatever the answer: some browsers say "prompt" and then send readings anyway
+  listen();
   if (typeof DOE.requestPermission === 'function') {
     try {
-      if ((await DOE.requestPermission()) !== 'granted') return false;
+      if ((await DOE.requestPermission()) === 'denied') return false;
     } catch {
-      return false; // not inside a tap, or the player said no
+      return false; // not inside a tap
     }
   }
-  listen();
   return true;
 }
 
