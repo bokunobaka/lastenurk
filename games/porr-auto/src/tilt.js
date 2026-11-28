@@ -7,9 +7,26 @@ let lean = 0; // sideways tilt of the screen, degrees: + = right edge down
 let live = false; // real readings have arrived
 let zero = 0; // how the tablet was held when the drive began counts as straight
 
-function screenAngle() {
-  const a = screen.orientation?.angle ?? window.orientation ?? 0;
-  return ((a % 360) + 360) % 360;
+// Which way the screen is turned (0, 90, 180, 270). iPad Safari asks for desktop sites and then may not say
+// (or says 0 in landscape), so the answer is only trusted when it agrees with the page's shape; otherwise
+// it is worked out from gravity: of the two edges it could be, the screen's top is the higher one.
+const guess = { land: 90, port: 0 };
+function screenAngle(ux, uy) {
+  const land = innerWidth > innerHeight;
+  const said = screen.orientation?.angle ?? window.orientation;
+  if (said != null) {
+    const a = ((said % 360) + 360) % 360;
+    if ((a % 180 === 90) === land) return a;
+  }
+  // screen-up in device axes is (1, 0) at 90 and (-1, 0) at 270; (0, 1) at 0 and (0, -1) at 180
+  if (land) {
+    if (ux > 0.2) guess.land = 90;
+    else if (ux < -0.2) guess.land = 270;
+    return guess.land;
+  }
+  if (uy > 0.2) guess.port = 0;
+  else if (uy < -0.2) guess.port = 180;
+  return guess.port;
 }
 
 function onOrient(e) {
@@ -19,7 +36,7 @@ function onOrient(e) {
   // "up" in device axes (x right, y to the top edge, z out of the screen in portrait)
   const ux = -Math.cos(b) * Math.sin(g), uy = Math.sin(b);
   // the screen's right in device axes: turning the screen by `angle` turns it the other way
-  const a = (screenAngle() * Math.PI) / 180;
+  const a = (screenAngle(ux, uy) * Math.PI) / 180;
   const rx = Math.cos(a), ry = -Math.sin(a);
   lean = (Math.asin(Math.max(-1, Math.min(1, -(ux * rx + uy * ry)))) * 180) / Math.PI;
 }
