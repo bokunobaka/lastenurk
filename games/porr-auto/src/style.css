@@ -158,6 +158,16 @@ h1 {
   transform: scale(1.18);
   box-shadow: 0 0 0 4px var(--ink), 0 4px 0 var(--edge);
 }
+.playRow {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 14px;
+}
+#endlessBtn small {
+  font-size: 0.6em;
+  opacity: 0.9;
+}
 .how {
   margin: 14px 0 0;
   color: var(--soft);

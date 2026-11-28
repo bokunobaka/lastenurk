@@ -5,7 +5,7 @@
 import './style.css';
 import * as A from './art.js';
 import { LEVELS } from './levels.js';
-import { build, CAR_W, CAR_L, SIDE, SIZE, HAZARD } from './track.js';
+import { build, endless, SEG, CAR_W, CAR_L, SIDE, SIZE, HAZARD } from './track.js';
 import { t, lang, setLang, applyText } from './i18n.js';
 import { sfx, unlock, isMuted, toggleMute, engine } from './sound.js';
 import * as tilt from './tilt.js';
@@ -30,7 +30,9 @@ function store(k, v) {
     localStorage.setItem(k, JSON.stringify(v));
   } catch {}
 }
+const RECORD = 'porr-auto.record'; // most stars in one endless drive
 let best = load(SAVE, {});
+let record = Number(load(RECORD, 0)) || 0;
 let colorI = clamp(Number(load(COLOR, 0)) || 0, 0, A.CAR_COLORS.length - 1);
 const carColor = () => A.CAR_COLORS[colorI];
 function frontier() {
@@ -41,7 +43,7 @@ function frontier() {
 
 // ---------- state ----------
 const DUCK_SPEED = 110, COW_SPEED = 70, SLOW = 0.45; // slow cars drive at 45% of our speed
-let li = 0;
+let li = 0; // the level, or 'endless'
 let T = null; // the built road
 let items = []; // the road's things, with their own state
 let car = null; // { x, y, vx, speed, air, bump, slow, wob }
@@ -58,6 +60,8 @@ let paused = false;
 let stuckT = 0; // how long a slow car has held us up
 let rumbleT = 0;
 let tipTimer = 0;
+let segK = 0; // which landscape of the endless road we are in
+let pruneT = 0;
 
 const playEl = $('play');
 const canvas = $('road');
@@ -87,6 +91,7 @@ function showTitle() {
   $('win').hidden = true;
   $('title').hidden = false;
   $('hero').innerHTML = A.carSide(carColor());
+  $('record').textContent = record ? `🏆 ${record}` : '';
   renderColors();
   renderGrid();
 }
@@ -134,7 +139,7 @@ function renderGrid() {
   });
 }
 
-// from a tap: sound and tilting may only be switched on inside one
+// from a tap: sound and tilting may only be switched on inside one. i = a level, or 'endless'
 async function go(i) {
   unlock();
   const ok = await tilt.request();
@@ -143,11 +148,15 @@ async function go(i) {
 }
 
 // ---------- a drive ----------
+const fresh = (it) => ({ ...it, gone: false, off: it.x - T.roadX(it.y), cool: 0, hurry: 0 });
+
 function startLevel(i) {
   li = i;
-  T = build(LEVELS[i]);
-  items = T.items.map((it) => ({ ...it, gone: false, off: it.x - T.roadX(it.y), cool: 0, hurry: 0 }));
+  T = i === 'endless' ? endless(Math.floor(Math.random() * 1e9)) : build(LEVELS[i]);
   car = { x: 0, y: 0, vx: 0, speed: 0, air: 0, bump: 0, slow: 0, wob: 0 };
+  if (import.meta.env.DEV && q.has("at")) (car.y = Number(q.get("at"))), (car.x = T.roadX(car.y)); // dev: start further on
+  items = T.endless ? T.extend(car.y + 4000).map(fresh) : T.items.map(fresh);
+  segK = T.endless ? T.segAt(car.y).k : 0;
   got = 0;
   combo = 0;
   fx = [];
@@ -163,7 +172,9 @@ function startLevel(i) {
   playEl.hidden = false;
   $('honkBtn').classList.remove('on');
   $('count').textContent = '⭐ 0';
-  say(t('ui.go', { to: t(`to.${T.lv.to}`) }), 2600, () => say(t(T.lv.tip), 4500));
+  $('progEnd').textContent = T.endless ? T.segAt(SEG).theme.emoji : '🏁';
+  if (T.endless) say(t('ui.endlessGo'), 3500);
+  else say(t('ui.go', { to: t(`to.${T.lv.to}`) }), 2600, () => say(t(T.lv.tip), 4500));
   resize();
   hud();
   if (!running) {
@@ -206,7 +217,9 @@ function update(dt) {
   }
 
   // sideways: snow is slippery (the car takes long to answer the steering)
-  const grip = T.lv.slip ? 2.4 : 11;
+  const plan = T.planAt(car.y);
+  const speed = T.speedAt(car.y);
+  const grip = plan.slip ? 2.4 : 11;
   car.vx += (steerTarget() - car.vx) * near(grip, dt);
   car.x += car.vx * dt;
   const mid = T.roadX(car.y);
@@ -218,7 +231,7 @@ function update(dt) {
   const grass = car.air <= 0 && Math.abs(car.x - mid) > T.half - CAR_W * 0.3;
 
   // forward
-  let want = phase === 'drive' ? T.speed : 0;
+  let want = phase === 'drive' ? speed : 0;
   if (grass) want *= 0.55;
   if (car.bump > 0) (car.bump -= dt), (want *= 0.25);
   if (car.slow > 0) (car.slow -= dt), (want *= 0.7);
@@ -234,7 +247,7 @@ function update(dt) {
   if (grass && car.speed > 60 && (rumbleT -= dt) <= 0) {
     rumbleT = 0.16;
     sfx.rumble();
-    puff(car.x + (Math.random() - 0.5) * 50, car.y - 60, 1, T.lv.theme === 'snow' ? '#fff' : '#cdb48c');
+    puff(car.x + (Math.random() - 0.5) * 50, car.y - 60, 1, plan.theme === 'snow' ? '#fff' : '#cdb48c');
   }
   if ((comboT -= dt) <= 0) combo = 0;
 
@@ -247,8 +260,9 @@ function update(dt) {
     phase = 'done';
     setTimeout(win, 600);
   }
-  engine(phase === 'drive' || phase === 'arrive' ? 0.12 + (car.speed / T.speed) * 0.88 : phase === 'ready' ? 0.05 : 0);
+  engine(phase === 'drive' || phase === 'arrive' ? 0.12 + (car.speed / speed) * 0.88 : phase === 'ready' ? 0.05 : 0);
 
+  if (T.endless) endlessRoad(dt);
   for (const it of items) if (!it.gone && Math.abs(it.y - car.y) < 1400) thing(it, dt);
   for (const p of fx) {
     p.life += dt;
@@ -291,7 +305,7 @@ function thing(it, dt) {
   }
   // a slow car drives along its lane; a honk sends it to the side
   if (k === 'car') {
-    if (car.y > it.y - 900 && it.y < T.length - 350) it.y += T.speed * SLOW * dt;
+    if (car.y > it.y - 900 && it.y < T.length - 350) it.y += T.speedAt(it.y) * SLOW * dt;
     if (it.y >= T.length - 350) it.goal = Math.sign(it.off || 1) * (T.half + 70);
     if (it.goal != null) it.off += (it.goal - it.off) * near(2.5, dt);
     it.x = T.roadX(it.y) + it.off;
@@ -306,6 +320,7 @@ function thing(it, dt) {
     if (touch(30, 1)) {
       it.gone = true;
       got++;
+      if (T.endless && got === record + 1 && record > 0) say(`🏆 ${t('win.record')}`, 2500);
       sfx.star(combo++);
       comboT = 1.6;
       burst(it.x, it.y + 26, 12, '#ffd43b', 260);
@@ -366,10 +381,48 @@ function thing(it, dt) {
   } else if (k === 'car' && Math.abs(dx) < CAR_W + 4 && dy > 0 && dy < CAR_L + 12) {
     // behind a slow car: we have to wait (or honk)
     car.y = it.y - CAR_L - 12;
-    car.speed = Math.min(car.speed, T.speed * SLOW);
+    car.speed = Math.min(car.speed, T.speedAt(it.y) * SLOW);
     stuckT += dt;
     if (stuckT > 1.2) $('honkBtn').classList.add('on');
   }
+}
+
+// the endless road: build ahead, forget what is far behind, greet each new landscape
+function endlessRoad(dt) {
+  for (const it of T.extend(car.y + 4000)) items.push(fresh(it));
+  if ((pruneT -= dt) <= 0) {
+    pruneT = 2;
+    items = items.filter((it) => !it.gone && it.y > car.y - 1500);
+    T.prune(car.y - 1500);
+  }
+  const sg = T.segAt(car.y);
+  if (sg.k !== segK) {
+    segK = sg.k;
+    say(`${sg.theme.emoji} ${t(`land.${sg.plan.theme}`)}`, 2500);
+    sfx.go();
+    $('progEnd').textContent = T.segAt(sg.y1).theme.emoji;
+  }
+}
+
+// 🏠 during an endless drive: stop and show how it went
+function endRun() {
+  phase = 'done';
+  engine(0);
+  const beat = got > record;
+  if (beat) {
+    record = got;
+    store(RECORD, record);
+  }
+  $('winPic').innerHTML = `${A.carSide(carColor())}<div class="place">${T.segAt(car.y).theme.emoji}</div>`;
+  $('winTitle').textContent = t(beat ? 'win.record' : 'win.endless');
+  $('winStars').innerHTML = `<span class="on">⭐</span>${got}`;
+  $('winCount').textContent = `🏆 ${record}`;
+  $('nextBtn').hidden = true;
+  $('win').hidden = false;
+  if (beat) {
+    sfx.win();
+    confetti();
+  } else sfx.go();
 }
 
 function bump(dir) {
@@ -414,6 +467,7 @@ function puff(x, y, n, color) {
 }
 
 // ---------- drawing ----------
+const smooth01 = (k) => (k <= 0 ? 0 : k >= 1 ? 1 : k * k * (3 - 2 * k));
 function hash(a, b) {
   let h = (a * 374761393 + b * 668265263) | 0;
   h = Math.imul(h ^ (h >>> 13), 1274126177);
@@ -422,18 +476,29 @@ function hash(a, b) {
 
 function draw() {
   const c = ctx;
-  const th = T.theme;
   c.setTransform(dpr, 0, 0, dpr, 0, 0);
-  c.fillStyle = th.ground;
-  c.fillRect(0, 0, cw, ch);
   const yTop = camY + carSY / scale + 100; // world y at the top of the screen
   const yBot = camY - (ch - carSY) / scale - 100;
   const xL = camX - cw / 2 / scale - 100, xR = camX + cw / 2 / scale + 100;
+  const segs = T.segsIn(yBot, yTop); // one landscape, or two where the endless road changes
+
+  // the ground; where one landscape turns into the next its colour fades over
+  if (segs.length === 1) c.fillStyle = segs[0].theme.ground;
+  else {
+    const g = c.createLinearGradient(0, sy(yBot), 0, sy(yTop));
+    const k = (y) => clamp((y - yBot) / (yTop - yBot), 0, 1);
+    segs.forEach((sg, i) => {
+      g.addColorStop(i ? k(sg.y0 + 250) : 0, sg.theme.ground);
+      g.addColorStop(i < segs.length - 1 ? k(sg.y1 - 250) : 1, sg.theme.ground);
+    });
+    c.fillStyle = g;
+  }
+  c.fillRect(0, 0, cw, ch);
 
   // spots on the ground, so it is easy to see that the car moves
   const G = 170;
-  c.fillStyle = th.spot;
-  for (let iy = Math.floor(yBot / G); iy <= yTop / G; iy++)
+  for (let iy = Math.floor(yBot / G); iy <= yTop / G; iy++) {
+    c.fillStyle = T.themeAt(iy * G).spot;
     for (let ix = Math.floor(xL / G); ix <= xR / G; ix++) {
       const h = hash(ix, iy);
       if (h > 0.55) continue;
@@ -441,37 +506,47 @@ function draw() {
       c.ellipse(sx(ix * G + h * 300), sy(iy * G + hash(iy, ix) * G), (18 + h * 40) * scale, (8 + h * 14) * scale, 0, 0, Math.PI * 2);
       c.fill();
     }
-
-  const ys = [];
-  const yEnd = T.length + 420; // the road ends in a round square in front of the place
-  for (let y = yBot; y < Math.min(yTop, yEnd) + 30; y += 30) ys.push(Math.min(y, yEnd));
-  const edge = (off) => ys.map((y) => [sx(T.roadX(y) + off), sy(y)]);
-  const band = (a, b, fill) => {
-    const L = edge(a), R = edge(b).reverse();
-    c.beginPath();
-    [...L, ...R].forEach(([x, y], i) => (i ? c.lineTo(x, y) : c.moveTo(x, y)));
-    c.closePath();
-    c.fillStyle = fill;
-    c.fill();
-  };
-
-  if (th.sea) {
-    // sand, then the sea with a wavy white edge
-    const L = ys.map((y) => [sx(T.roadX(y) - T.half - 210 + Math.sin(y * 0.012 + clock * 2) * 10), sy(y)]);
-    c.beginPath();
-    c.moveTo(-10, sy(ys[0]));
-    L.forEach(([x, y]) => c.lineTo(x, y));
-    c.lineTo(-10, sy(ys[ys.length - 1]));
-    c.closePath();
-    c.fillStyle = '#5ec2ea';
-    c.fill();
-    c.strokeStyle = '#fff';
-    c.lineWidth = 8 * scale;
-    c.beginPath();
-    L.forEach(([x, y], i) => (i ? c.lineTo(x, y) : c.moveTo(x, y)));
-    c.stroke();
   }
-  if (ys.length > 1) {
+
+  const yEnd = T.length + 420; // the road ends in a round square in front of the place
+  const span = (a, b) => {
+    const ys = [];
+    for (let y = a; y < b; y += 30) ys.push(y);
+    ys.push(b);
+    return ys;
+  };
+  for (const sg of segs) {
+    const th = sg.theme;
+    const a = Math.max(yBot, sg.y0), b = Math.min(yTop, sg.y1, yEnd);
+    if (b <= a) continue;
+    const ys = span(a, b);
+    const edge = (off) => ys.map((y) => [sx(T.roadX(y) + off), sy(y)]);
+    const band = (l, r, fill) => {
+      c.beginPath();
+      [...edge(l), ...edge(r).reverse()].forEach(([x, y], i) => (i ? c.lineTo(x, y) : c.moveTo(x, y)));
+      c.closePath();
+      c.fillStyle = fill;
+      c.fill();
+    };
+    if (th.sea) {
+      // sand, then the sea with a wavy white edge; on the endless road the shore curves in and out
+      const L = ys.map((y) => {
+        const away = 1 - smooth01((y - sg.y0) / 1000) * smooth01((sg.y1 - y) / 1000);
+        return [sx(T.roadX(y) - T.half - 210 - away * 1800 + Math.sin(y * 0.012 + clock * 2) * 10), sy(y)];
+      });
+      c.beginPath();
+      c.moveTo(-10, sy(ys[0]));
+      L.forEach(([x, y]) => c.lineTo(x, y));
+      c.lineTo(-10, sy(ys[ys.length - 1]));
+      c.closePath();
+      c.fillStyle = '#5ec2ea';
+      c.fill();
+      c.strokeStyle = '#fff';
+      c.lineWidth = 8 * scale;
+      c.beginPath();
+      L.forEach(([x, y], i) => (i ? c.lineTo(x, y) : c.moveTo(x, y)));
+      c.stroke();
+    }
     if (th.walk) {
       band(-T.half - 46, -T.half, th.walk);
       band(T.half, T.half + 46, th.walk);
@@ -484,28 +559,31 @@ function draw() {
   }
   // the round end of the road
   if (yTop > yEnd) {
+    const th = T.themeAt(yEnd);
     c.beginPath();
     c.ellipse(sx(T.roadX(yEnd)), sy(yEnd), T.half * scale * 1.3, T.half * scale * 0.9, 0, 0, Math.PI * 2);
     c.fillStyle = th.road === 'rainbow' ? '#ffe3f1' : th.road;
     c.fill();
   }
-  const lineEnd = T.length + 260;
+  const lineEnd = Math.min(yTop, T.length + 260);
   if (yBot < lineEnd) {
     // white edge lines and dashed lanes (none on the rainbow, it has its stripes)
     c.strokeStyle = 'rgba(255,255,255,0.9)';
     c.lineCap = 'round';
     c.lineWidth = 7 * scale;
+    const ys = span(yBot, lineEnd);
     for (const off of [-T.half + 14, T.half - 14]) {
       c.beginPath();
-      ys.filter((y) => y <= lineEnd).forEach((y, i) => (i ? c.lineTo : c.moveTo).call(c, sx(T.roadX(y) + off), sy(y)));
+      ys.forEach((y, i) => (i ? c.lineTo : c.moveTo).call(c, sx(T.roadX(y) + off), sy(y)));
       c.stroke();
     }
     c.lineWidth = 6 * scale;
     const D = 140;
-    for (const off of th.road === 'rainbow' ? [] : [-T.gap / 2, T.gap / 2]) {
+    for (const off of [-T.gap / 2, T.gap / 2]) {
       c.beginPath();
       for (let k = Math.floor(yBot / D); k * D < Math.min(yTop, T.length); k++) {
         const y0 = k * D, y1 = y0 + 70;
+        if (T.themeAt(y0).road === 'rainbow') continue;
         c.moveTo(sx(T.roadX(y0) + off), sy(y0));
         c.lineTo(sx(T.roadX((y0 + y1) / 2) + off), sy((y0 + y1) / 2));
         c.lineTo(sx(T.roadX(y1) + off), sy(y1));
@@ -531,7 +609,7 @@ function draw() {
 
   // everything standing up, the far ones first
   const list = [];
-  for (const d of T.decor) if (d.y > yBot - 200 && d.y < yTop + 300 && d.x > xL - 300 && d.x < xR + 300) list.push([d.y, () => at(d.x, d.y, () => A.decor(c, d, { night: T.lv.night }))]);
+  for (const d of T.decor) if (d.y > yBot - 200 && d.y < yTop + 300 && d.x > xL - 300 && d.x < xR + 300) list.push([d.y, () => at(d.x, d.y, () => A.decor(c, d, { night: T.nightAt(d.y) > 0.3 }))]);
   for (const it of items) {
     if (it.gone || it.y < yBot - 100 || it.y > yTop + 200) continue;
     const k = it.kind;
@@ -603,7 +681,8 @@ function draw() {
     }
   }
   c.globalAlpha = 1;
-  if (T.lv.night) drawNight();
+  const n = T.nightAt(camY + 200);
+  if (n > 0.01) drawNight(n);
 }
 const i2c = (p) => (p.life * 10) % 2 < 1 ? '#ffd43b' : '#fff';
 
@@ -620,17 +699,17 @@ function drawCar() {
   c.translate(0, -k * 70);
   c.scale(1 + k * 0.3, 1 + k * 0.3);
   c.rotate((car.vx / SIDE) * 0.32 + (car.wob > 0 ? Math.sin(clock * 38) * car.wob * 0.4 : 0));
-  A.carTop(c, carColor(), { brake: car.bump > 0 || phase === 'arrive', lights: T.lv.night });
+  A.carTop(c, carColor(), { brake: car.bump > 0 || phase === 'arrive', lights: T.nightAt(car.y) > 0.3 });
   c.restore();
 }
 
 // night: a dark layer with holes where the headlights, street lamps and stars shine
-function drawNight() {
+function drawNight(n) {
   const d = dctx;
   d.setTransform(dpr, 0, 0, dpr, 0, 0);
   d.globalCompositeOperation = 'source-over';
   d.clearRect(0, 0, cw, ch);
-  d.fillStyle = 'rgba(14,20,58,0.8)';
+  d.fillStyle = `rgba(14,20,58,${0.8 * n})`;
   d.fillRect(0, 0, cw, ch);
   d.globalCompositeOperation = 'destination-out';
   const hole = (x, y, r, a = 1) => {
@@ -673,8 +752,10 @@ function drawNight() {
 }
 
 // ---------- the heads-up: progress and stars ----------
+// the bar: how far to the place, or on the endless road how far to the next landscape
 function hud() {
-  const k = clamp(car.y / T.length, 0, 1);
+  const sg = T.endless && T.segAt(car.y);
+  const k = sg ? clamp((car.y - sg.y0) / SEG, 0, 1) : clamp(car.y / T.length, 0, 1);
   $('progFill').style.width = `calc(${k * 100}% - ${k * 6}px)`;
   $('progCar').style.left = `${k * 100}%`;
 }
@@ -761,7 +842,9 @@ $('honkBtn').addEventListener('pointerdown', (e) => {
   honk();
 });
 $('playBtn').onclick = () => go(frontier());
-$('levelsBtn').onclick = showTitle;
+$('levelsBtn').onclick = () => (li === 'endless' && (phase === 'ready' || phase === 'drive') ? endRun() : showTitle());
+$('homeBtn').onclick = showTitle;
+$('endlessBtn').onclick = () => go('endless');
 $('againBtn').onclick = () => go(li);
 $('nextBtn').onclick = () => go(Math.min(li + 1, LEVELS.length - 1));
 const muteBtn = $('muteBtn');
@@ -807,7 +890,8 @@ if (import.meta.env.DEV && q.has('auto'))
   };
 
 // dev shortcut: ?level=5 opens that level straight away
-if (q.has('level')) startLevel(clamp(Number(q.get('level')) - 1, 0, LEVELS.length - 1));
+if (q.has('endless')) startLevel('endless');
+else if (q.has('level')) startLevel(clamp(Number(q.get('level')) - 1, 0, LEVELS.length - 1));
 else showTitle();
 
 // dev only: lets a test script see the state

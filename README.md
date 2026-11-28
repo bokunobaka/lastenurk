@@ -21,7 +21,7 @@ Estonian picture books and games for ages 4–6, all in one place.
 | ➕ | **Konn Krooks**: adding and taking away, 25 levels: number cards make a frog hop along lily pads 0–20 to catch a fly (Vite) | `games/konn-krooks/` | [/games/konn-krooks/](https://bokunobaka.github.io/lastenurk/games/konn-krooks/) |
 | 🧩 | **Näljased kastid**: sorting game, 22 levels: drag things off a conveyor belt into hungry boxes by colour, kind, size, shape, spots; rubbish into bins (Vite) | `games/naljased-kastid/` | [/games/naljased-kastid/](https://bokunobaka.github.io/lastenurk/games/naljased-kastid/) |
 | 🐛 | **Mustriröövik**: pattern game, 25 levels: fill the gaps in a caterpillar's patterned body (colours, pictures, sizes, dots, arrows, growing patterns, a wrong segment) (Vite) | `games/mustriroovik/` | [/games/mustriroovik/](https://bokunobaka.github.io/lastenurk/games/mustriroovik/) |
-| 🚗 | **Põrr-auto**: driving game, 12 drives: tilt the tablet (or drag a finger) to steer, collect stars, dodge cones, jump ramps, honk at slow cars (Vite) | `games/porr-auto/` | [/games/porr-auto/](https://bokunobaka.github.io/lastenurk/games/porr-auto/) |
+| 🚗 | **Põrr-auto**: driving game, 12 drives and an endless road: tilt the tablet (or drag a finger) to steer, collect stars, dodge cones, jump ramps, honk at slow cars (Vite) | `games/porr-auto/` | [/games/porr-auto/](https://bokunobaka.github.io/lastenurk/games/porr-auto/) |
 
 ## Layout
 

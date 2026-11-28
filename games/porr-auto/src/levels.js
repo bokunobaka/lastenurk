@@ -21,3 +21,18 @@ export const LEVELS = [
   { to: 'hut', theme: 'mountain', length: 10500, curvy: 0.55, width: 420, mix: { star: 3, rock: 2, ramp: 1, cow: 1 }, tip: 'tip.mountain', seed: 27 },
   { to: 'castle', theme: 'rainbow', length: 12000, curvy: 0.45, mix: { star: 4, cone: 1, puddle: 1, ramp: 1, duck: 1, car: 1 }, tip: 'tip.last', seed: 3 },
 ];
+
+// The endless road: these landscapes one after another, round and round (see endless() in src/track.js).
+// Each one is a little faster; every round has more things on the road than stars.
+export const ENDLESS = [
+  { theme: 'meadow', curvy: 0.25, mix: { star: 3, cone: 1 } },
+  { theme: 'town', curvy: 0.2, mix: { star: 3, cone: 1, car: 1 } },
+  { theme: 'forest', curvy: 0.35, mix: { star: 3, rock: 1, duck: 1 } },
+  { theme: 'beach', curvy: 0.3, mix: { star: 3, puddle: 2, ramp: 1 } },
+  { theme: 'farm', curvy: 0.3, mix: { star: 3, cow: 1, puddle: 1, cone: 1 } },
+  { theme: 'snow', curvy: 0.3, slip: true, mix: { star: 3, snowman: 2, ramp: 1 } },
+  { theme: 'desert', curvy: 0.4, mix: { star: 3, rock: 2, ramp: 1, car: 1 } },
+  { theme: 'night', curvy: 0.3, night: true, mix: { star: 3, cone: 2, duck: 1 } },
+  { theme: 'mountain', curvy: 0.4, mix: { star: 3, rock: 2, ramp: 1, cow: 1 } },
+  { theme: 'rainbow', curvy: 0.35, mix: { star: 4, cone: 1, puddle: 1, ramp: 1, duck: 1, car: 1 } },
+];

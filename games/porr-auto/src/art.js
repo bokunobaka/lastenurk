@@ -456,6 +456,19 @@ const D = {
     ell(c, 0, -10, 80, 26, 'rgba(120,160,220,0.18)');
     for (const [x, y, r] of [[-44, -26, 30], [-10, -42, 40], [32, -30, 32], [56, -18, 22]]) circ(c, x, y, r, '#fff');
   },
+  // a sign where a new landscape begins on the endless road (the emoji is drawn by decor())
+  sign(c) {
+    shadow(c, 30, 9);
+    rr(c, -5, -120, 10, 120, 3);
+    c.fillStyle = '#8b5a33';
+    c.fill();
+    rr(c, -52, -190, 104, 82, 18);
+    c.fillStyle = '#fff';
+    c.fill();
+    c.lineWidth = 6;
+    c.strokeStyle = '#ffc93c';
+    c.stroke();
+  },
   lollipop(c, v) {
     shadow(c, 18, 6);
     rr(c, -3, -80, 6, 80, 3);
@@ -476,6 +489,12 @@ const D = {
 export function decor(c, it, opts) {
   c.scale(it.s, it.s);
   D[it.kind]?.(c, it.v, opts);
+  if (it.emoji) {
+    c.font = '56px sans-serif';
+    c.textAlign = 'center';
+    c.textBaseline = 'middle';
+    c.fillText(it.emoji, 0, -147);
+  }
 }
 
 // ---------- the finish arch and where the road goes ----------

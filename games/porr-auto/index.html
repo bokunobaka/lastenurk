@@ -25,7 +25,10 @@
       <h1 data-i18n="ui.title">Põrr-auto</h1>
       <p class="sub" data-i18n="ui.tagline">Kalluta ja sõida!</p>
       <div id="colors" class="colors" role="group" data-i18n-aria="aria.color" aria-label="Auto värv"></div>
-      <button id="playBtn" class="big" data-i18n="ui.play">▶ Sõida</button>
+      <div class="playRow">
+        <button id="playBtn" class="big" data-i18n="ui.play">▶ Sõida</button>
+        <button id="endlessBtn" class="big alt"><span data-i18n="ui.endless">∞ Lõputu sõit</span> <small id="record"></small></button>
+      </div>
       <p id="how" class="how"></p>
       <div id="levelGrid" class="levelGrid"></div>
     </div>
@@ -49,6 +52,7 @@
         <div id="winStars" class="winStars"></div>
         <div id="winCount" class="winCount"></div>
         <div class="btns">
+          <button id="homeBtn" class="big alt" data-i18n-aria="aria.home" aria-label="Avalehele">🏠</button>
           <button id="againBtn" class="big alt" data-i18n-aria="aria.again" aria-label="Uuesti">↻</button>
           <button id="nextBtn" class="big" data-i18n-aria="aria.next" aria-label="Järgmine">▶</button>
         </div>
